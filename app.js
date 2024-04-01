@@ -42,12 +42,16 @@ app.get('/login',  (req, res) => {
     res.render('login');
 });
 
-app.get('/signup',  (req, res) => {
+app.get('/views/signup.ejs',  (req, res) => {
     res.render('signup');
 });
 
 app.get('/createblog',  (req, res) => {
     res.render('createblog');
+});
+
+app.get('/views/newmember.ejs',  (req, res) => {
+    res.render('newmember');
 });
 
 app.listen(process.env.PORT || 3001, ()=>{ 

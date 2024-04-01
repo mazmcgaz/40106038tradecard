@@ -51,6 +51,11 @@
   background-color: #f6fdc3;
   border: thin solid grey;
 }
+
+.card {
+  max-width: 300px; /* check if this is ok */
+}
+
 /* media query 
   @media (min-width: 319px) and (max-width: 480px) {
     .row{
