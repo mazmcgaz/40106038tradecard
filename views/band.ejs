@@ -1,0 +1,24 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>favourites</title>
+    <link rel="stylesheet" href="https://cdn.simplecss.org/simple.min.css" />
+  </head>
+  <body>
+    <header>
+      <h3>Choose</h3>
+    </header>
+    <main>
+      <p>Your favourite band is....</p>
+      <h4><%= data %></h4>
+      <form action="/fav" method="post">
+        <input name="favourite" />
+        <input type="submit" value="choose" />
+      </form>
+      | <a href="/page1">next</a>
+    </main>
+  </body>
+</html>
