@@ -1,5 +1,7 @@
 const express = require('express');
-let app = express();
+const app = express();
+
+app.use(express.static("public"));
 
 //middleware to use the EJS template engine
 app.set('view engine', 'ejs');
@@ -16,7 +18,7 @@ app.get('/',  (req, res) => {
 });
 
 // DISPLAY HOME PAGE
-app.get('/views/index.ejs',  (req, res) => {
+app.get('/views/index',  (req, res) => {
     res.render('index');
 });
 
@@ -54,6 +56,12 @@ app.get('/views/newmember.ejs',  (req, res) => {
     res.render('newmember');
 });
 
+app.get('*', (req, res) => {
+    res.send('404! This is an invalid URL.');
+  });
+
+
+
 app.listen(process.env.PORT || 3001, ()=>{ 
-    console.log("server started on: localhost:3000/fav");
+    console.log("server started on: localhost:3001");
 });
