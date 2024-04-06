@@ -1,6 +1,20 @@
 const express = require('express');
 const app = express();
 const mysql  = require('mysql2');
+const bcrypt = require("bcrypt");
+const saltRounds = 10;
+
+
+const db = mysql.createConnection({
+    host: 'localhost',
+    user: 'root',
+    password: 'root',
+    database: 'tradecard_project',  //change to your DB name
+    port: '8889'
+});
+
+module.exports = db;
+
 
 // adding in SESSIONS *********************************
 const cookieParser = require('cookie-parser');
@@ -19,15 +33,6 @@ app.use(sessions({
 // session **********************************************
 
 
-
-
-const db = mysql.createConnection({
-    host: 'localhost',
-    user: 'root',
-    password: 'root',
-    database: 'tradecard_project',  //change to your DB name
-    port: '8889'
-});
 
 db.connect((err)=> {
     if(err) throw err;
@@ -63,21 +68,54 @@ app.post('/', (req, res) => {
 });
 
 
+app.get("/newmember", (req, res) => {
+    res.render("newmember.ejs");
+  });
+  
+// register
+app.post("/newmember", async (req, res) => {
+    const email = req.body.username;
+    const password = req.body.password;
+    const firstname = req.body.firstname;
+    const lastname = req.body.lastname;
+    const role = req.body.role;
 
+    try {
+        const checkResult = await db.query("SELECT * FROM User WHERE user_email = $1", [email]);
 
-
-
-
-app.get('/shows',(req,res) => {
-
-    const seriessql = `SELECT * FROM series LIMIT 6`;
-    
-    db.query(seriessql, (err, rows1) => {
-        if(err) throw err;
-        res.render('tv', {series: rows1});
-    });
-    
+        if (checkResult.rows.length > 0) {
+            res.send("Email already exists. Try logging in to your account.");
+        } else {
+            //hashing the password and saving it in the database
+            bcrypt.hash(password, saltRounds, async (err, hash) => {
+                if (err) {
+                    console.error("Error hashing password:", err);
+                    res.status(500).send("Error hashing password");
+                } else {
+                    console.log("Hashed Password:", hash);
+                    try {
+                        await db.query(
+                            "INSERT INTO User (user_display_name, user_email, user_password, user_first_name, user_last_name, user_role) VALUES ($1, $2, $3, $4, $5, $6)",
+                            [email, email, hash, firstname, lastname, role]
+                        );
+                        res.render("secrets.ejs");
+                    } catch (insertError) {
+                        console.error("Error inserting new user:", insertError);
+                        res.status(500).send("Error inserting new user");
+                    }
+                    
+                }
+            });
+        }
+    } catch (err) {
+        console.log(err);
+        res.status(500).send("Server error");
+    }
 });
+
+
+
+
 
 
 app.get('/dashboard', (req,res) => {

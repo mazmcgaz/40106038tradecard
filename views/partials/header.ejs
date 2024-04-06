@@ -61,20 +61,29 @@
               <li class="nav-item">
                 <a class="nav-link" href="/views/howtoplay.ejs">How to Play</a>
               </li>
+              <li class="nav-item">
+                <a class="nav-link" href="/views/newmember.ejs">Sign up</a>
+              </li>
               <li class="nav-item dropdown">
                 <a
                   class="nav-link dropdown-toggle"
-                  href="#"
+                  href="/allcards.ejs"
                   role="button"
                   data-bs-toggle="dropdown"
                   aria-expanded="false"
-                  >Collections</a
+                  >All Cards</a
                 >
                 <ul class="dropdown-menu">
-                  <li><a class="dropdown-item" href="#">Option 1</a></li>
-                  <li><a class="dropdown-item" href="#">Option 2</a></li>
+                  <li>
+                    <a class="dropdown-item" href="/allcards">Option 1</a>
+                  </li>
+                  <li>
+                    <a class="dropdown-item" href="/allcards">Option 2</a>
+                  </li>
                   <li><hr class="dropdown-divider" /></li>
-                  <li><a class="dropdown-item" href="#">Option 3</a></li>
+                  <li>
+                    <a class="dropdown-item" href="/allcards">Option 3</a>
+                  </li>
                 </ul>
               </li>
             </ul>
@@ -85,14 +94,13 @@
                 placeholder="Search cards"
                 aria-label="Search"
               />
-              <button class="btn btn-sm btn-outline-success" type="submit">
-                Log in
-              </button>
             </form>
+            <a href="/views/login" class="btn btn-sm btn-outline-success"
+              >Log in</a
+            >
           </div>
         </div>
       </nav>
     </header>
-    <main class="containermain"></main>
   </body>
 </html>

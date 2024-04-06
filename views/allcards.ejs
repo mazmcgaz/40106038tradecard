@@ -1,0 +1,30 @@
+<%- include("partials/header.ejs") %>
+
+<div class="container">
+  <div class="row">
+    <div class="col text-center">
+      <!-- Center align content -->
+      <h1><%= title %></h1>
+      <hr />
+      <!-- Horizontal line for separation -->
+      <% rowdata.forEach((series)=> { %>
+      <!-- Loop through rowdata -->
+      <div class="card mb-3">
+        <!-- Bootstrap card -->
+        <div class="card-body">
+          <h5 class="card-title"><%= series.series_name %></h5>
+          <!-- Series name -->
+          <p class="card-text">
+            <!-- Link to series details -->
+            <a href="/row?seriesid=<%= series.id %>" class="btn btn-primary"
+              >Details</a
+            >
+          </p>
+        </div>
+      </div>
+      <% }) %>
+    </div>
+  </div>
+</div>
+
+<%- include("partials/footer.ejs") %>
