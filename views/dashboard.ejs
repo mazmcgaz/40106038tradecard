@@ -1,0 +1,78 @@
+<%- include("partials/loggedinheader.ejs") %>
+
+<style>
+  .action-item {
+    background-color: #f6ea9a; /* Grey background */
+    border: 1px solid #ced4da; /* Border outline */
+    padding: 10px;
+    margin-bottom: 10px;
+    color: black;
+  }
+
+  .action-item:hover {
+    background-color: #e3c416; /* Light grey on hover */
+  }
+</style>
+
+<div class="px-4 pt-5 my-5 text-center border-bottom">
+  <h1 class="display-4 fw-bold text-body-emphasis">Dashboard</h1>
+  <h2>Welcome back,</h2>
+
+  <div class="container">
+    <div class="row">
+      <div class="col text-center">
+        <!-- Center align content -->
+
+        <hr />
+        <!-- Horizontal line for separation -->
+
+        <div class="container">
+          <!-- Nested container for action items -->
+          <div class="row">
+            <!-- Row to hold action items -->
+            <div class="col-md-3">
+              <!-- Bootstrap column for each action item -->
+              <div class="action-item">
+                <p>View My Card Collection</p>
+                <a href="#">Go</a>
+              </div>
+            </div>
+            <div class="col-md-3">
+              <!-- Bootstrap column for each action item -->
+              <div class="action-item">
+                <p>Search Directory</p>
+                <a href="#">Go</a>
+              </div>
+            </div>
+            <div class="col-md-3">
+              <!-- Bootstrap column for each action item -->
+              <div class="action-item">
+                <p>Create a blog</p>
+                <a href="#">Go</a>
+              </div>
+            </div>
+            <div class="col-md-3">
+              <!-- Bootstrap column for each action item -->
+              <div class="action-item">
+                <p>Account Settings</p>
+                <a href="#">Go</a>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <br />
+        <br />
+        <br />
+        <br />
+        <br />
+      </div>
+    </div>
+  </div>
+</div>
+
+<main>
+  <!-- Main content goes here -->
+</main>
+
+<%- include("partials/footer.ejs") %>

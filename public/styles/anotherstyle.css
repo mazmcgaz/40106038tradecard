@@ -42,8 +42,13 @@
 }
 
 .container {
+  margin-top: 100px;
   padding: 100px;
   background-color: blue;
+  display: flex;
+  justify-content: space-around;
+  align-items: center;
+  flex-wrap: wrap; /* Allow items to wrap to the next line if needed */
 }
 
 .col-xl-2 {
@@ -56,8 +61,16 @@
 }
 
 .card {
-  max-width: 300px; /* check if this is ok */
+  width: calc(
+    33.33% - 20px
+  ); /* Adjust width to fit three cards in a row with margins */
+  margin: 10px; /* Margin between cards */
 }
+
+/*
+.card {
+  max-width: 300px; /* check if this is ok 
+} */
 
 .feature-icon {
   width: 4rem;
@@ -66,7 +79,7 @@
 }
 
 /* Remove duplicate footer styles */
-footer {
+.footer {
   flex: 0 0 auto;
   position: relative;
   width: 100%;
@@ -77,7 +90,22 @@ footer {
   flex-direction: column;
   justify-content: center;
   align-items: center;
-  color: white;
+  color: blue;
+}
+
+.footer-content {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.social-icons,
+.menu-items {
+  display: flex;
+}
+
+.menu-items a {
+  margin-left: 20px; /* Adjust as needed */
 }
 
 footer .social_icon,
@@ -136,10 +164,60 @@ footer .menu li a:hover {
   color: #666;
 }
 
-/* media query 
-  @media (min-width: 319px) and (max-width: 480px) {
-    .row{
-  
-    }
+.blockquote {
+  width: 200px;
+  height: 150px;
+  background-color: #f0f0f0;
+  border: 1px solid #ccc;
+  margin: 20px;
+  padding: 20px;
+  transition: background-color 0.3s ease;
+}
+
+.blockquote:hover {
+  background-color: #e0e0e0;
+}
+
+.blockquote p {
+  margin: 0;
+}
+
+.blockquote a {
+  display: block;
+  margin-top: 10px;
+}
+
+.action-item-dashboard {
+  width: 200px;
+  height: 100px;
+  background-color: #8d3737;
+  border: 1px solid #7c4f4f;
+  margin: 10px;
+  padding: 20px;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+  margin-bottom: 10px;
+}
+
+.action-item:hover {
+  background-color: #2a237a;
+}
+
+.action-item p {
+  margin: 0;
+}
+
+.action-item a {
+  display: block;
+  margin-top: 10px;
+  color: #333;
+  text-decoration: none;
+}
+
+@media (max-width: 768px) {
+  .card {
+    width: calc(
+      50% - 20px
+    ); /* Adjust width for smaller screens to fit two cards in a row */
   }
-  */
+}

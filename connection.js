@@ -72,70 +72,38 @@ app.get("/newmember", (req, res) => {
     res.render("newmember.ejs");
   });
   
-// register
-app.post("/newmember", async (req, res) => {
-    const email = req.body.username;
-    const password = req.body.password;
-    const firstname = req.body.firstname;
-    const lastname = req.body.lastname;
-    const role = req.body.role;
 
-    try {
-        const checkResult = await db.query("SELECT * FROM User WHERE user_email = $1", [email]);
 
-        if (checkResult.rows.length > 0) {
-            res.send("Email already exists. Try logging in to your account.");
-        } else {
-            //hashing the password and saving it in the database
-            bcrypt.hash(password, saltRounds, async (err, hash) => {
-                if (err) {
-                    console.error("Error hashing password:", err);
-                    res.status(500).send("Error hashing password");
-                } else {
-                    console.log("Hashed Password:", hash);
-                    try {
-                        await db.query(
-                            "INSERT INTO User (user_display_name, user_email, user_password, user_first_name, user_last_name, user_role) VALUES ($1, $2, $3, $4, $5, $6)",
-                            [email, email, hash, firstname, lastname, role]
-                        );
-                        res.render("secrets.ejs");
-                    } catch (insertError) {
-                        console.error("Error inserting new user:", insertError);
-                        res.status(500).send("Error inserting new user");
-                    }
-                    
-                }
-            });
-        }
-    } catch (err) {
-        console.log(err);
-        res.status(500).send("Server error");
+
+
+
+
+
+  app.get('/dashboard', (req, res) => {
+    const sessionobj = req.session;
+    if (sessionobj.authen) {
+        const uid = sessionobj.authen;
+        const userQuery = `SELECT * FROM User WHERE user_id = ?`;
+
+        db.query(userQuery, [uid], (err, rows) => {
+            if (err) {
+                console.error("Error fetching user data:", err);
+                res.status(500).send("Internal Server Error");
+                return;
+            }
+
+            if (rows.length > 0) {
+                const userData = rows[0];
+                res.render('dashboard', { user: userData });
+            } else {
+                res.send("User not found");
+            }
+        });
+    } else {
+        res.send("Denied");
     }
 });
 
-
-
-
-
-
-app.get('/dashboard', (req,res) => {
-    const sessionobj = req.session;
-    if(sessionobj.authen){
-
-        const uid = sessionobj.authen;
-        const user = `SELECT * FROM User WHERE user_id = "${uid}" `;
-        
-        db.query(user, (err, row)=>{ 
-            const firstrow = row[0];
-            res.render('dashboard', {userdata:firstrow});
-        });
-
-
-
-    }else{
-        res.send("denied");
-    } 
-});
 
 
 app.listen(3005,()=>{

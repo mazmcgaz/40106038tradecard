@@ -23,7 +23,6 @@
       }
     </style>
   </head>
-
   <body>
     <header>
       <nav class="navbar fixed-top navbar-expand-lg bg-body-tertiary">
@@ -62,35 +61,7 @@
                 <a class="nav-link" href="/views/howtoplay.ejs">How to Play</a>
               </li>
               <li class="nav-item">
-                <a class="nav-link" href="/views/newmember.ejs">Sign up</a>
-              </li>
-              <li class="nav-item dropdown">
-                <a
-                  class="nav-link dropdown-toggle"
-                  href="/allcards.ejs"
-                  role="button"
-                  data-bs-toggle="dropdown"
-                  aria-expanded="false"
-                  >All Cards</a
-                >
-                <ul class="dropdown-menu">
-                  <li>
-                    <a class="dropdown-item" href="/allcards"
-                      >Original Series</a
-                    >
-                  </li>
-                  <li>
-                    <a class="dropdown-item" href="/allcards"
-                      >Black & White Series</a
-                    >
-                  </li>
-                  <li><hr class="dropdown-divider" /></li>
-                  <li>
-                    <a class="dropdown-item" href="/allcards"
-                      >Platinum Series</a
-                    >
-                  </li>
-                </ul>
+                <a class="nav-link" href="/views/dashboard.ejs">Dashboard</a>
               </li>
             </ul>
             <form class="d-flex" role="search">
@@ -101,12 +72,20 @@
                 aria-label="Search"
               />
             </form>
-            <a href="/views/login" class="btn btn-sm btn-outline-success"
-              >Log in</a
+            <a href="#" onclick="logout()" class="btn btn-sm btn-outline-danger"
+              >Log out</a
             >
           </div>
         </div>
       </nav>
     </header>
+
+    <script>
+      function logout() {
+        if (confirm("Are you sure you want to log out?")) {
+          window.location.href = "/";
+        }
+      }
+    </script>
   </body>
 </html>
