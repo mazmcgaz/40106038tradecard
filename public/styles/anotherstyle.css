@@ -200,7 +200,7 @@ footer .menu li a:hover {
 }
 
 .action-item:hover {
-  background-color: #2a237a;
+  background-color: #b6002e;
 }
 
 .action-item p {
@@ -212,6 +212,11 @@ footer .menu li a:hover {
   margin-top: 10px;
   color: #333;
   text-decoration: none;
+}
+
+.action-item img {
+  max-width: 100%; /* Set maximum width for images */
+  height: auto; /* Maintain aspect ratio */
 }
 
 @media (max-width: 768px) {

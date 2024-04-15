@@ -5,37 +5,52 @@
     background-color: #f6ea9a; /* Grey background */
     border: 1px solid #ced4da; /* Border outline */
     padding: 10px;
-    margin-bottom: 10px;
+    margin-bottom: 20px;
     color: black;
   }
 
   .action-item:hover {
     background-color: #e3c416; /* Light grey on hover */
+    transform: scale(1.1); /* Enlarge the card on hover */
+  }
+
+  .action-item img {
+    max-width: 90%; /* Set maximum width for images */
+    height: auto; /* Maintain aspect ratio */
+  }
+
+  /* Modal styles */
+  .modal-dialog {
+    max-width: 800px; /* Adjust maximum width as needed */
   }
 </style>
 
 <div class="px-4 pt-5 my-5 text-center border-bottom">
   <h1 class="display-4 fw-bold text-body-emphasis"><%= title %></h1>
+  <br />
 
   <div class="container">
     <div class="row">
-      <!-- Loop through rowdata -->
-      <% rowdata.forEach((series)=> { %>
+      <!-- Loop through all of the cards -->
+      <% rowdata.forEach((card)=> { %>
       <div class="col-md-4">
         <!-- Bootstrap column for each action item -->
-        <div class="action-item">
-          <h5><%= series.series_name %></h5>
-          <!-- Series name -->
+        <div
+          class="action-item"
+          onclick="window.location='/views/carddetailspage/<%= card.card_id %>'"
+        >
+          <!-- card name -->
+          <h4><%= card.card_name %></h4>
 
-          <p><%= series.descript %></p>
-          <!-- Series description -->
+          <img src="<%= card.image_url %>" alt="<%= card.card_name %>" />
 
-          <p>
-            <!-- Link to series details -->
-            <a href="/row?seriesid=<%= series.id %>">Browse</a>
-          </p>
+          <p>Price: $<%= card.price_market %></p>
 
-          <img src="<%= series.img_test %>" alt="<%= series.series_name %>" />
+          <!-- Button to open modal -->
+          <button type="button" class="btn btn-primary">View Details</button>
+
+          <!-- Add to Wishlist button -->
+          <button type="button" class="btn btn-light">Add to Wishlist</button>
         </div>
       </div>
       <% }) %>
@@ -43,7 +58,7 @@
   </div>
 
   <main>
-    <!-- Main content goes here -->
+    <!-- Mainh content goes here -->
   </main>
 
   <%- include("partials/footer.ejs") %>

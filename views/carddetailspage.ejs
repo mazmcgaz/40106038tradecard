@@ -1,0 +1,99 @@
+<%- include("partials/header.ejs") %>
+
+<style>
+  .card-details-container {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    margin-top: 50px;
+  }
+
+  .card-image {
+    max-width: 100%;
+    height: auto;
+  }
+
+  .card-details {
+    margin-right: 50px;
+  }
+
+  .card-details h2 {
+    margin-bottom: 20px;
+  }
+
+  .card-details p {
+    margin-bottom: 10px;
+  }
+
+  .back-to-cards-button {
+    margin-top: 20px;
+  }
+</style>
+
+<div class="px-4 pt-5 my-5 text-center border-bottom">
+  <h1 class="display-4 fw-bold text-body-emphasis">Card Details</h1>
+  <br />
+
+  <main>
+    <div class="container card-details-container">
+      <div class="row">
+        <div class="col-md-6 order-md-2">
+          <!-- Card Details -->
+          <div class="card-details">
+            <h2><%= card.card_name %></h2>
+            <p>HP <%= card.hit_points_id %></p>
+            <p>
+              <img
+                src="<%= card.attack_1_img_1 %>"
+                alt="attack image 2"
+                class="card-image"
+              />
+              <%= card.attack_1 %>
+            </p>
+
+            <% if (card.attack_2) { %>
+            <p>
+              <img
+                src="<%= card.attack_2_img_1 %>"
+                alt="attack image 2"
+                class="card-image"
+              />
+              <%= card.attack_2 %>
+            </p>
+            <% } %>
+
+            <p>Weakness: <%= card.weakness_type %></p>
+            <p>Condition: <%= card.card_condition_type %></p>
+            <p>Rarity: <%= card.rarity_type %></p>
+            <p>Expansion: <%= card.expansion_name %></p>
+            <p>
+              Illustrator: <%= card.illustrator_first_name %> <%=
+              card.illustrator_last_name %>
+            </p>
+
+            <!-- Add more card details here -->
+          </div>
+        </div>
+        <div class="col-md-6 order-md-1">
+          <!-- Card Image -->
+          <img
+            src="<%= card.image_url %>"
+            alt="<%= card.card_name %>"
+            class="card-image"
+          />
+        </div>
+      </div>
+    </div>
+    <div class="container">
+      <div class="row">
+        <div class="col-md-12 text-center">
+          <a href="/allcards" class="btn btn-primary back-to-cards-button"
+            >Back to Cards</a
+          >
+        </div>
+      </div>
+    </div>
+  </main>
+</div>
+
+<%- include("partials/footer.ejs") %>

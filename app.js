@@ -17,6 +17,26 @@ app.set('view engine', 'ejs');
 //middleware to be able POST <form> data 
 app.use(express.urlencoded({extended: true}));
 
+
+
+// adding in SESSIONS *********************************
+const cookieParser = require('cookie-parser');
+const sessions = require('express-session');
+
+const oneHour = 1000 * 60 * 60 * 1;
+
+app.use(cookieParser());
+
+app.use(sessions({
+   secret: "qubpokemon40106038",
+   saveUninitialized: true,
+   cookie: { maxAge: oneHour },
+   resave: false
+}));
+// session **********************************************
+
+
+
 //store favourite band in a global variable
 let favband = "not choosen yet";
 
@@ -25,20 +45,97 @@ app.get('/',  (req, res) => {
     res.render('index');
 });
 
-app.get('/allcards',(req,res) => {
-    const pokeseries = `SELECT * FROM series `;
-    connection.query(pokeseries, (err, rows) => {
-        if(err) throw err;
-        res.render('allcards',{title: 'Card Collection;', rowdata: rows});
-    });
 
-    //  const seriessql = `SELECT * FROM series LIMIT 6`;
-    //db.query(seriessql, (err, rows1) => {
-    //    if(err) throw err;
-   //     res.render('tv', {series: rows1});
-   // });
-    
+
+
+
+// show the all the cards in the database
+app.get('/allcards', (req, res) => {
+    const cardsQuery = `SELECT card_id, card_name, image_url, price_market, price_low FROM card`;
+    connection.query(cardsQuery, (err, rows) => {
+        if (err) throw err;
+        res.render('allcards', { title: 'All Cards:', rowdata: rows });
+    });
 });
+
+
+
+
+// Route to fetch card details and render the card details page with modal
+app.get('/views/carddetailspage/:id', (req, res) => {
+    const cardId = req.params.id;
+    const cardQuery = `
+        SELECT 
+            card.card_id,
+            card.card_name,
+            card.image_url,
+            card.price_market,
+            card.price_low,
+            card.price_mid,
+            card.price_high,
+            card.attack_1,
+            card.attack_1_img_1,
+            card.attack_1_img_2,
+            card.attack_2,
+            card.attack_2_img_1,
+            card.attack_2_img_2,
+            card.hit_points_id,
+            weakness.weakness_type,
+            card.weakness_number,
+            card_condition.card_condition_type,
+            illustrator.illustrator_first_name,
+            illustrator.illustrator_last_name,
+            expansion.expansion_name,
+            rarity.rarity_type
+
+        FROM 
+            CARD card
+        JOIN 
+            weakness ON card.weakness_id = weakness.weakness_id
+        JOIN 
+            card_condition ON card.card_condition_id = card_condition.card_condition_id
+
+         JOIN 
+            illustrator ON card.illustrator_id = illustrator.illustrator_id
+         JOIN 
+            expansion ON card.expansion_id = expansion.expansion_id
+         JOIN 
+            rarity ON card.rarity_id = rarity.rarity_id
+      
+      
+            WHERE 
+            card.card_id = ?`;
+    connection.query(cardQuery, [cardId], (err, rows) => {
+        if (err) {
+            console.error('Error fetching card details:', err);
+            res.status(500).send('Error fetching card details');
+            return;
+        }
+        
+        if (rows.length === 0) {
+            res.status(404).send('Card not found');
+            return;
+        }
+
+        const cardData = rows[0];
+        res.render('carddetailspage', { card: cardData });
+    });
+});
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 // DISPLAY HOME PAGE
@@ -56,6 +153,10 @@ app.get('/views/about',  (req, res) => {
     res.render('about');
 });
 
+app.get('/views/account',  (req, res) => {
+    res.render('account');
+});
+
 app.get('/views/howtoplay',  (req, res) => {
     res.render('howtoplay');
 });
@@ -68,7 +169,9 @@ app.get('/views/register',  (req, res) => {
     res.render('register');
 });
 
-
+app.get('/views/carddetailspage',  (req, res) => {
+    res.render('carddetailspage');
+});
 
 
 app.get('/views/signup.ejs',  (req, res) => {
@@ -153,7 +256,8 @@ app.post("/views/login", async (req, res) => {
                     if (result) {
                         res.render("dashboard");
                     } else {
-                        res.send("Incorrect Password");
+                        res.send("<script>alert('Incorrect password'); window.location='/views/login';</script>");
+                        //res.send("Incorrect Password");
                     }
                 }
             });
@@ -193,6 +297,46 @@ app.get('/dashboard', (req, res) => {
     }
 });
 
+
+
+
+// 5. Display account page with User details
+app.get('/views/account', (req, res) => {
+    const userId = req.session.authen; // Assuming you store user ID in session
+    const userQuery = 'SELECT * FROM User WHERE user_id = ?';
+    connection.query(userQuery, [userId], (err, result) => {
+        if (err) {
+            console.error('Error fetching user details:', err);
+            res.status(500).send('Error fetching user details');
+            return;
+        }
+        
+        if (result.length === 0) {
+            res.status(404).send('User not found');
+            return;
+        }
+
+        const userData = result[0];
+        res.render('account', { userData }); // Pass userData to the template
+    });
+});
+
+// 6. Update user's display name
+app.post('/updateUser', (req, res) => {
+    const newDisplayName = req.body.newDisplayName;
+    const userId = req.session.authen; // Assuming you store user ID in session
+
+    const updateQuery = 'UPDATE User SET user_display_name = ? WHERE user_id = ?';
+    connection.query(updateQuery, [newDisplayName, userId], (err, result) => {
+        if (err) {
+            console.error('Error updating user display name:', err);
+            res.status(500).send('Error updating user display name');
+            return;
+        }
+        
+        res.redirect('/views/account'); // Redirect back to the account page after updating
+    });
+});
 
 
 

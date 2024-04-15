@@ -1,0 +1,37 @@
+<%- include("partials/loggedinheader.ejs") %>
+
+<main>
+  <br />
+  <div class="container mt-5">
+    <div class="row justify-content-center">
+      <div class="col-md-6">
+        <div class="card">
+          <div class="card-body">
+            <h5 class="card-title text-center mb-4">Update Display Name</h5>
+            <form action="/updateUser" method="POST">
+              <div class="mb-3">
+                <label for="newDisplayName" class="form-label"
+                  >New Display Name:</label
+                >
+                <input
+                  type="text"
+                  class="form-control"
+                  id="newDisplayName"
+                  name="newDisplayName"
+                  required
+                />
+              </div>
+              <div class="text-center">
+                <button type="submit" class="btn btn-primary">
+                  Update Display Name
+                </button>
+              </div>
+            </form>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</main>
+
+<%- include("partials/footer.ejs") %>

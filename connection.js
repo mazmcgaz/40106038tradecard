@@ -25,7 +25,7 @@ const oneHour = 1000 * 60 * 60 * 1;
 app.use(cookieParser());
 
 app.use(sessions({
-   secret: "myshows14385899",
+   secret: "qubpokemon40106038",
    saveUninitialized: true,
    cookie: { maxAge: oneHour },
    resave: false
@@ -72,40 +72,7 @@ app.get("/newmember", (req, res) => {
     res.render("newmember.ejs");
   });
   
-
-
-
-
-
-
-
-  app.get('/dashboard', (req, res) => {
-    const sessionobj = req.session;
-    if (sessionobj.authen) {
-        const uid = sessionobj.authen;
-        const userQuery = `SELECT * FROM User WHERE user_id = ?`;
-
-        db.query(userQuery, [uid], (err, rows) => {
-            if (err) {
-                console.error("Error fetching user data:", err);
-                res.status(500).send("Internal Server Error");
-                return;
-            }
-
-            if (rows.length > 0) {
-                const userData = rows[0];
-                res.render('dashboard', { user: userData });
-            } else {
-                res.send("User not found");
-            }
-        });
-    } else {
-        res.send("Denied");
-    }
-});
-
-
-
-app.listen(3005,()=>{
-    console.log('Server on port 3005');
+  
+app.listen(3009,()=>{
+    console.log('Server on port 3009');
 });
