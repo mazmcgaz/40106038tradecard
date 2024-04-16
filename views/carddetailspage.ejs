@@ -34,6 +34,19 @@
   <h1 class="display-4 fw-bold text-body-emphasis">Card Details</h1>
   <br />
 
+  <% if (userLoggedIn) { %>
+  <div class="container">
+    <div class="row">
+      <div class="col-md-12 text-center">
+        <a href="/views/dashboard" class="btn btn-primary back-to-cards-button"
+          >Back to Dashboard</a
+        >
+      </div>
+    </div>
+  </div>
+
+  <% } %>
+
   <main>
     <div class="container card-details-container">
       <div class="row">
@@ -42,22 +55,19 @@
           <div class="card-details">
             <h2><%= card.card_name %></h2>
             <p>HP <%= card.hit_points_id %></p>
+
             <p>
-              <img
-                src="<%= card.attack_1_img_1 %>"
-                alt="attack image 2"
-                class="card-image"
-              />
+              <img src="<%= card.attack_1_img_1 %>" alt="" class="card-image" />
+              <img src="<%= card.attack_1_img_2 %>" alt="" class="card-image" />
+              <img src="<%= card.attack_1_img_3 %>" alt="" class="card-image" />
               <%= card.attack_1 %>
             </p>
 
             <% if (card.attack_2) { %>
             <p>
-              <img
-                src="<%= card.attack_2_img_1 %>"
-                alt="attack image 2"
-                class="card-image"
-              />
+              <img src="<%= card.attack_2_img_1 %>" alt="" class="card-image" />
+              <img src="<%= card.attack_2_img_2 %>" alt="" class="card-image" />
+              <img src="<%= card.attack_2_img_3 %>" alt="" class="card-image" />
               <%= card.attack_2 %>
             </p>
             <% } %>
@@ -87,7 +97,7 @@
     <div class="container">
       <div class="row">
         <div class="col-md-12 text-center">
-          <a href="/allcards" class="btn btn-primary back-to-cards-button"
+          <a href="/views/allcards" class="btn btn-primary back-to-cards-button"
             >Back to Cards</a
           >
         </div>

@@ -10,11 +10,8 @@
       integrity="sha384-aFq/bzH65dt+w6FI2ooMVUpc+21e0SRygnTpmBvdBgSdnuTN7QbdgL+OapgHtvPp"
       crossorigin="anonymous"
     />
-    <link
-      rel="stylesheet"
-      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.10.2/css/all.css"
-    />
-    <link rel="stylesheet" href="/public/styles/anotherstyle.css" />
+
+    <link rel="stylesheet" href="../../public/styles/style.css" />
     <style>
       .feature-icon {
         width: 4rem;
@@ -56,44 +53,45 @@
                 <a class="nav-link active" aria-current="page" href="/">Home</a>
               </li>
               <li class="nav-item">
-                <a class="nav-link" href="/views/about.ejs">Blog</a>
+                <a class="nav-link" href="/views/blog">Blog</a>
               </li>
               <li class="nav-item">
-                <a class="nav-link" href="/views/howtoplay.ejs">How to Play</a>
+                <a class="nav-link" href="/views/howtoplay">How to Play</a>
+              </li>
+
+              <li class="nav-item">
+                <a class="nav-link" href="/views/allcards">Cards</a>
+              </li>
+
+              <% if (userLoggedIn) { %>
+
+              <li class="nav-item">
+                <a class="nav-link" href="/views/dashboard">Dashboard</a>
               </li>
               <li class="nav-item">
-                <a class="nav-link" href="/views/newmember.ejs">Sign up</a>
-              </li>
-              <li class="nav-item dropdown">
                 <a
-                  class="nav-link dropdown-toggle"
-                  href="/allcards.ejs"
-                  role="button"
-                  data-bs-toggle="dropdown"
-                  aria-expanded="false"
-                  >All Cards</a
+                  class="nav-link btn btn-sm btn-outline-success"
+                  href="/logout"
+                  >Log out</a
                 >
-                <ul class="dropdown-menu">
-                  <li>
-                    <a class="dropdown-item" href="/allcards"
-                      >Original Series</a
-                    >
-                  </li>
-                  <li>
-                    <a class="dropdown-item" href="/allcards"
-                      >Black & White Series</a
-                    >
-                  </li>
-                  <li><hr class="dropdown-divider" /></li>
-                  <li>
-                    <a class="dropdown-item" href="/allcards"
-                      >Platinum Series</a
-                    >
-                  </li>
-                </ul>
               </li>
+
+              <% } else { %>
+              <li class="nav-item">
+                <a
+                  class="nav-link btn btn-sm btn-outline-danger"
+                  href="/views/login"
+                  >Log in</a
+                >
+              </li>
+              <li class="nav-item">
+                <a class="nav-link" href="/views/newmember">Sign up</a>
+              </li>
+
+              <% } %>
             </ul>
-            <form class="d-flex" role="search">
+
+            <form class="d-flex">
               <input
                 class="form-control me-2"
                 type="search"
@@ -101,12 +99,15 @@
                 aria-label="Search"
               />
             </form>
-            <a href="/views/login" class="btn btn-sm btn-outline-success"
-              >Log in</a
-            >
           </div>
         </div>
       </nav>
     </header>
+
+    <script
+      src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"
+      integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz"
+      crossorigin="anonymous"
+    ></script>
   </body>
 </html>

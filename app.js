@@ -1,23 +1,10 @@
 const express = require('express');
 const app = express();
+const path = require('path');
+const mysql  = require('mysql2');
 const connection = require("./connection.js");
 const bcrypt = require('bcrypt'); // Import bcrypt module
 const saltRounds = 10;
-
-const { promisify } = require('util');
-
-// Promisify the connection.query function
-const queryAsync = promisify(connection.query).bind(connection);
-
-app.use(express.static("public"));
-
-//middleware to use the EJS template engine
-app.set('view engine', 'ejs');
-
-//middleware to be able POST <form> data 
-app.use(express.urlencoded({extended: true}));
-
-
 
 // adding in SESSIONS *********************************
 const cookieParser = require('cookie-parser');
@@ -27,42 +14,114 @@ const oneHour = 1000 * 60 * 60 * 1;
 
 app.use(cookieParser());
 
+// middleware to config sesssion data
 app.use(sessions({
    secret: "qubpokemon40106038",
    saveUninitialized: true,
    cookie: { maxAge: oneHour },
    resave: false
 }));
+
+//middleware to use the EJS template engine
+app.set('view engine', 'ejs');
+
+//middleware to be able POST <form> data 
+app.use(express.urlencoded({extended: true}));
+
 // session **********************************************
 
+const { promisify } = require('util');
+
+// Promisify the connection.query function
+const queryAsync = promisify(connection.query).bind(connection);
 
 
-//store favourite band in a global variable
-let favband = "not choosen yet";
+const publicDirectory = path.join(__dirname, './public');
+app.use(express.static(publicDirectory));
 
-// DISPLAY HOME PAGE
-app.get('/',  (req, res) => {
-    res.render('index');
+
+
+// Middleware to determine if the user is logged in
+const userLoggedIn = (req, res, next) => {
+    req.userLoggedIn = req.session.authen ? true : false;
+    next();
+};
+
+// Pass userLoggedIn to all views
+//app.use(userLoggedIn);
+app.use((req, res, next) => {
+    res.locals.userLoggedIn = req.userLoggedIn;
+    next();
 });
 
 
 
+// DISPLAY HOME PAGE
+app.get('/',  (req, res) => {
+   // Set the userLoggedIn variable based on whether the user is logged in or not
+   const userLoggedIn = req.session.authen ? true : false;
+   res.render('index', { userLoggedIn: userLoggedIn });
+});
 
 
-// show the all the cards in the database
-app.get('/allcards', (req, res) => {
-    const cardsQuery = `SELECT card_id, card_name, image_url, price_market, price_low FROM card`;
-    connection.query(cardsQuery, (err, rows) => {
+app.post('/', (req, res) => {
+    const useremail = req.body.emailField;
+    const password = req.body.passwordField;
+    const checkUser = `SELECT * FROM User WHERE user_email = "${useremail}" AND user_password = "${password}"`;
+    
+    db.query(checkUser, (err, rows) => {
         if (err) throw err;
-        res.render('allcards', { title: 'All Cards:', rowdata: rows });
+        const numRows = rows.length;
+        if (numRows > 0) {
+            const sessionobj = req.session;  
+            sessionobj.authen = rows[0].user_id;
+            res.redirect('/dashboard');
+        } else {
+            // Send alert message and redirect to login page
+            res.send('<script>alert("Incorrect log in details. Please try again."); window.location="/";</script>');
+        }
     });
 });
 
 
 
 
+
+
+// show the all the cards in the database
+app.get('/views/allcards', (req, res) => {
+    // Check if the user is logged in
+    const userLoggedIn = req.session.authen ? true : false;
+
+    // Fetch all the cards from the database
+    const cardsQuery = `SELECT card_id, card_name, image_url, price_market, price_low FROM card`;
+    connection.query(cardsQuery, (err, rows) => {
+        if (err) {
+            console.error("Error fetching cards:", err);
+            res.status(500).send("Internal Server Error");
+            return;
+        }
+
+        // Render different navigation bars based on user login status
+        if (userLoggedIn) {
+            // If the user is logged in, render the navigation bar for logged-in users
+            res.render('allcards', { title: 'All Cards:', rowdata: rows, userLoggedIn: true });
+        } else {
+            // If the user is not logged in, render the navigation bar for logged-out users
+            res.render('allcards', { title: 'All Cards:', rowdata: rows, userLoggedIn: false });
+        }
+    });
+});
+
+
+
+
+
 // Route to fetch card details and render the card details page with modal
 app.get('/views/carddetailspage/:id', (req, res) => {
+    // Check if the user is logged in
+    const userLoggedIn = req.session.authen ? true : false;
+
     const cardId = req.params.id;
     const cardQuery = `
         SELECT 
@@ -76,9 +135,11 @@ app.get('/views/carddetailspage/:id', (req, res) => {
             card.attack_1,
             card.attack_1_img_1,
             card.attack_1_img_2,
+            card.attack_1_img_3,
             card.attack_2,
             card.attack_2_img_1,
             card.attack_2_img_2,
+            card.attack_2_img_3,
             card.hit_points_id,
             weakness.weakness_type,
             card.weakness_number,
@@ -87,41 +148,37 @@ app.get('/views/carddetailspage/:id', (req, res) => {
             illustrator.illustrator_last_name,
             expansion.expansion_name,
             rarity.rarity_type
-
         FROM 
             CARD card
         JOIN 
             weakness ON card.weakness_id = weakness.weakness_id
         JOIN 
             card_condition ON card.card_condition_id = card_condition.card_condition_id
-
-         JOIN 
+        JOIN 
             illustrator ON card.illustrator_id = illustrator.illustrator_id
-         JOIN 
+        JOIN 
             expansion ON card.expansion_id = expansion.expansion_id
-         JOIN 
+        JOIN 
             rarity ON card.rarity_id = rarity.rarity_id
-      
-      
-            WHERE 
+        WHERE 
             card.card_id = ?`;
+
     connection.query(cardQuery, [cardId], (err, rows) => {
         if (err) {
             console.error('Error fetching card details:', err);
             res.status(500).send('Error fetching card details');
             return;
         }
-        
+
         if (rows.length === 0) {
             res.status(404).send('Card not found');
             return;
         }
 
         const cardData = rows[0];
-        res.render('carddetailspage', { card: cardData });
+        res.render('carddetailspage', { card: cardData, userLoggedIn: userLoggedIn });
     });
 });
-
 
 
 
@@ -149,13 +206,13 @@ app.post('/fav',  (req, res) => {
     res.render('index', {data: favband});
 });
 
-app.get('/views/about',  (req, res) => {
-    res.render('about');
+app.get('/views/blog',  (req, res) => {
+    res.render('blog');
 });
 
-app.get('/views/account',  (req, res) => {
-    res.render('account');
-});
+// app.get('/views/account',  (req, res) => {
+//     res.render('account');
+// });
 
 app.get('/views/howtoplay',  (req, res) => {
     res.render('howtoplay');
@@ -174,7 +231,7 @@ app.get('/views/carddetailspage',  (req, res) => {
 });
 
 
-app.get('/views/signup.ejs',  (req, res) => {
+app.get('/views/signup',  (req, res) => {
     res.render('signup');
 });
 
@@ -182,7 +239,7 @@ app.get('/createblog',  (req, res) => {
     res.render('createblog');
 });
 
-app.get('/views/newmember.ejs',  (req, res) => {
+app.get('/views/newmember',  (req, res) => {
     res.render('newmember');
 });
 
@@ -254,7 +311,10 @@ app.post("/views/login", async (req, res) => {
                     console.error("Error comparing passwords:", err);
                 } else {
                     if (result) {
-                        res.render("dashboard");
+                        req.session.authen = user.user_id; // Set user ID in session upon successful login
+                        res.redirect('/views/dashboard');
+
+                       //  res.render("dashboard");
                     } else {
                         res.send("<script>alert('Incorrect password'); window.location='/views/login';</script>");
                         //res.send("Incorrect Password");
@@ -269,57 +329,82 @@ app.post("/views/login", async (req, res) => {
     }
 });
 
-//4. show their dashboard
-// Show user's dashboard
-// Show user's dashboard
-app.get('/dashboard', (req, res) => {
-    const sessionobj = req.session;
-    if (sessionobj.authen) {
-        const uid = sessionobj.authen;
-        const userQuery = `SELECT user_display_name FROM User WHERE user_id = ?`;
+// Logout route
+app.get("/logout", (req, res) => {
+    req.session.destroy(); // Destroy the session upon logout
+    res.redirect("/"); // Redirect to home page after logout
+});
 
-        db.query(userQuery, [uid], (err, rows) => {
+
+
+
+//4. show their dashboard
+// 4. Show the dashboard page
+app.get('/views/dashboard', (req, res) => {
+    // Check if the user is logged in
+    const userLoggedIn = req.session.authen ? true : false;
+
+    // If the user is logged in, fetch user data and render the dashboard page
+    if (userLoggedIn) {
+        const userId = req.session.authen;
+        const userQuery = `SELECT * FROM User WHERE user_id = ?`;
+
+        connection.query(userQuery, [userId], (err, rows) => {
             if (err) {
                 console.error("Error fetching user data:", err);
                 res.status(500).send("Internal Server Error");
                 return;
             }
-
             if (rows.length > 0) {
-                const firstrow = row[0];
-            res.render('dashboard', {userdata:firstrow});
+                const firstRow = rows[0];
+                res.render('dashboard', { userLoggedIn: userLoggedIn, userData: firstRow });
             } else {
                 res.send("User not found");
             }
         });
     } else {
+        // If the user is not logged in, deny access
         res.send("Denied");
     }
 });
 
 
-
-
 // 5. Display account page with User details
 app.get('/views/account', (req, res) => {
-    const userId = req.session.authen; // Assuming you store user ID in session
-    const userQuery = 'SELECT * FROM User WHERE user_id = ?';
-    connection.query(userQuery, [userId], (err, result) => {
-        if (err) {
-            console.error('Error fetching user details:', err);
-            res.status(500).send('Error fetching user details');
-            return;
-        }
-        
-        if (result.length === 0) {
-            res.status(404).send('User not found');
-            return;
-        }
+   // Check if the user is logged in
+   const userLoggedIn = req.session.authen ? true : false;
 
-        const userData = result[0];
-        res.render('account', { userData }); // Pass userData to the template
-    });
+   // If the user is logged in, fetch user data and render the dashboard page
+   if (userLoggedIn) {
+       const userId = req.session.authen;
+       const userQuery = `SELECT * FROM User WHERE user_id = ?`;
+
+       connection.query(userQuery, [userId], (err, rows) => {
+           if (err) {
+               console.error("Error fetching user data:", err);
+               res.status(500).send("Internal Server Error");
+               return;
+           }
+           if (rows.length > 0) {
+               const firstRow = rows[0];
+               res.render('account', { userLoggedIn: userLoggedIn, userData: firstRow });
+           } else {
+               res.send("User not found");
+           }
+       });
+   } else {
+       // If the user is not logged in, deny access
+       res.send("Denied");
+   }
 });
+
+
+
+
+
+
+
+
 
 // 6. Update user's display name
 app.post('/updateUser', (req, res) => {
