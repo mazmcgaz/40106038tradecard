@@ -1,0 +1,64 @@
+<%- include("partials/header.ejs") %>
+
+<style>
+  .action-item {
+    background-color: #96cc6a; /* Grey background */
+    border: 1px solid #ced4da; /* Border outline */
+    padding: 10px;
+    margin-bottom: 10px;
+    color: black;
+  }
+
+  .action-item:hover {
+    background-color: #cde6b8; /* Light grey on hover */
+  }
+</style>
+
+<div class="px-4 pt-5 my-5 text-center border-bottom">
+  <h1 class="display-4 fw-bold text-body-emphasis">Your Collections</h1>
+  <h2>View your collections below:</h2>
+
+  <div class="container">
+    <div class="row">
+      <div class="col-md-6 text-center">
+        <a href="/views/dashboard" class="btn btn-primary back-to-cards-button"
+          >Back to Dashboard</a
+        >
+      </div>
+      <div class="col-md-6 text-center">
+        <a href="/views/createcollection" class="btn btn-success"
+          >Create New Collection</a
+        >
+      </div>
+    </div>
+  </div>
+  <!-- Grey separation line -->
+  <hr class="my-4" />
+
+  <div class="container">
+    <div class="row">
+      <!-- Loop through all of the collections -->
+      <% collections.forEach((collection) => { %>
+      <div class="col-md-4">
+        <!-- Bootstrap column for each action item -->
+        <div class="action-item">
+          <!-- Collection name -->
+          <h4><%= collection.collection_name %></h4>
+
+          <!-- Collection description -->
+          <p><%= collection.collection_description %></p>
+
+          <!-- Button to view collection details -->
+          <a
+            href="/views/collectiondetails/<%= collection.collection_id %>"
+            class="btn btn-primary"
+            >View Collection</a
+          >
+        </div>
+      </div>
+      <% }) %>
+    </div>
+  </div>
+</div>
+
+<%- include("partials/footer.ejs") %>

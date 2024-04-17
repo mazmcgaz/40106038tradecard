@@ -1,0 +1,90 @@
+<%- include("partials/header.ejs") %>
+
+<style>
+  .card-details-container {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    margin-top: 50px;
+  }
+
+  .card-image {
+    max-width: 100%;
+    height: auto;
+  }
+
+  .card-details {
+    margin-right: 50px;
+  }
+
+  .card-details h2 {
+    margin-bottom: 20px;
+  }
+
+  .card-details p {
+    margin-bottom: 10px;
+  }
+
+  .back-to-cards-button {
+    margin-top: 20px;
+  }
+</style>
+
+<div class="px-4 pt-5 my-5 text-center border-bottom">
+  <h1 class="display-4 fw-bold text-body-emphasis">Collection Details</h1>
+  <br />
+
+  <% if (userLoggedIn) { %>
+  <div class="container">
+    <div class="row">
+      <div class="col-md-12 text-center">
+        <a href="/views/dashboard" class="btn btn-primary back-to-cards-button"
+          >Back to Dashboard</a
+        >
+      </div>
+    </div>
+  </div>
+
+  <% } %>
+
+  <main>
+    <% if (userLoggedIn) { %>
+    <div class="container">
+      <div class="row">
+        <div class="col-md-12 text-center">
+          <a
+            href="/views/usercollection"
+            class="btn btn-primary back-to-cards-button"
+            >Back to Your Collections</a
+          >
+        </div>
+      </div>
+    </div>
+    <% } %>
+
+    <!-- Display card details -->
+    <div class="container">
+      <div class="row">
+        <% if (cards.length === 0) { %>
+        <div class="col-md-12 text-center">
+          <p></p>
+          <p>This collection is empty.</p>
+        </div>
+        <% } else { %> <% cards.forEach((card) => { %>
+        <div class="col-md-6 card-details-container">
+          <div class="card-details">
+            <h2><%= card.card_name %></h2>
+            <img
+              src="<%= card.image_url %>"
+              alt="<%= card.card_name %>"
+              class="card-image"
+            />
+          </div>
+        </div>
+        <% }) %> <% } %>
+      </div>
+    </div>
+  </main>
+</div>
+
+<%- include("partials/footer.ejs") %>

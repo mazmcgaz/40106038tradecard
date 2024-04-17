@@ -5,6 +5,11 @@ const mysql  = require('mysql2');
 const connection = require("./connection.js");
 const bcrypt = require('bcrypt'); // Import bcrypt module
 const saltRounds = 10;
+const methodOverride = require('method-override');
+
+
+// middleware to override _method in updating data (put / post) 
+app.use(methodOverride('_method'));
 
 // adding in SESSIONS *********************************
 const cookieParser = require('cookie-parser');
@@ -13,6 +18,8 @@ const sessions = require('express-session');
 const oneHour = 1000 * 60 * 60 * 1;
 
 app.use(cookieParser());
+
+
 
 // middleware to config sesssion data
 app.use(sessions({
@@ -117,12 +124,11 @@ app.get('/views/allcards', (req, res) => {
 
 
 
-// Route to fetch card details and render the card details page with modal
+// Route to fetch card details and render the card details page 
 app.get('/views/carddetailspage/:id', (req, res) => {
-    // Check if the user is logged in
-    const userLoggedIn = req.session.authen ? true : false;
-
     const cardId = req.params.id;
+
+    // Fetch card details
     const cardQuery = `
         SELECT 
             card.card_id,
@@ -176,13 +182,83 @@ app.get('/views/carddetailspage/:id', (req, res) => {
         }
 
         const cardData = rows[0];
-        res.render('carddetailspage', { card: cardData, userLoggedIn: userLoggedIn });
+        const userLoggedIn = req.session.authen ? true : false;
+        
+        if (userLoggedIn) {
+            const userId = req.session.authen; // Use req.session.authen to retrieve user ID
+            const collectionsQuery = `SELECT * FROM collection WHERE user_id = ?`;
+            connection.query(collectionsQuery, [userId], (err, collections) => {
+                if (err) {
+                    console.error('Error fetching user collections:', err);
+                    res.status(500).send('Error fetching user collections');
+                    return;
+                }
+                
+                console.log('Collections:', collections); // Log fetched collections
+                res.render('carddetailspage', { card: cardData, userLoggedIn: userLoggedIn, collections: collections });
+            });
+        } else {
+            res.render('carddetailspage', { card: cardData, userLoggedIn: userLoggedIn, collections: [] });
+        }
+    });
+});
+
+
+// view all the cards in each individual collection belonging to a user
+app.get('/views/collectiondetails/:id', (req, res) => {
+    // Check if the user is logged in
+    const userLoggedIn = req.session.authen ? true : false;
+
+    const collectionId = req.params.id;
+    const collectionQuery = `
+    SELECT card.card_id, card.card_name, card.image_url
+    FROM card
+    JOIN collection_card ON card.card_id = collection_card.card_id
+    WHERE collection_card.collection_id =  ?`;
+
+    connection.query(collectionQuery, [collectionId], (err, rows) => {
+        if (err) {
+            console.error('Error fetching card details:', err);
+            res.status(500).send('Error fetching card details');
+            return;
+        }
+
+        // Pass userLoggedIn status to the template
+        res.render('collectiondetails', { cards: rows, userLoggedIn: userLoggedIn });
     });
 });
 
 
 
 
+
+// add a card to a collection
+app.get('/views/addtocollection/:id', (req, res) => {
+    // Check if the user is logged in
+    const userLoggedIn = req.session.authen ? true : false;
+
+    const collectionId = req.params.id; // Retrieve collectionId from the URL parameter
+    const collectionQuery = `
+    SELECT card.card_id, card.card_name, card.image_url
+    FROM card
+    JOIN collection_card ON card.card_id = collection_card.card_id
+    WHERE collection_card.collection_id =  ?`;
+    
+    connection.query(collectionQuery, [collectionId], (err, rows) => {
+        if (err) {
+            console.error('Error fetching card details:', err);
+            res.status(500).send('Error fetching card details');
+            return;
+        }
+
+        if (rows.length === 0) {
+            res.status(404).send('Unable to load page');
+            return;
+        }
+
+        res.render('addtocollection', { cards: rows, userLoggedIn: userLoggedIn, collectionId: collectionId }); // Pass collectionId to the template
+    });
+});
 
 
 
@@ -364,7 +440,7 @@ app.get('/views/dashboard', (req, res) => {
         });
     } else {
         // If the user is not logged in, deny access
-        res.send("Denied");
+        res.send("Denied - please log in.");
     }
 });
 
@@ -394,8 +470,88 @@ app.get('/views/account', (req, res) => {
        });
    } else {
        // If the user is not logged in, deny access
-       res.send("Denied");
+       res.send("Denied - please log in.");
    }
+});
+
+
+// 6. user collection page
+// 6. user collection page
+app.get('/views/usercollection', (req, res) => {
+    // Check if the user is logged in
+    const userLoggedIn = req.session.authen ? true : false;
+
+    // If the user is logged in, fetch user collections and render the user collection page
+    if (userLoggedIn) {
+        const userId = req.session.authen;
+        const collectionsQuery = `SELECT * FROM collection WHERE user_id = ?`;
+
+        connection.query(collectionsQuery, [userId], (err, rows) => {
+            if (err) {
+                console.error("Error fetching user collections:", err);
+                res.status(500).send("Internal Server Error");
+                return;
+            }
+            // Render the usercollection view with user collections data
+            res.render('usercollection', { userLoggedIn: userLoggedIn, collections: rows });
+        });
+    } else {
+        // If the user is not logged in, deny access
+        res.send("Denied - please log in.");
+    }
+});
+
+
+// 7. create NEW collection 
+app.get('/views/createcollection', (req, res) => {
+    // Check if the user is logged in
+    const userLoggedIn = req.session.authen ? true : false;
+
+    // If the user is logged in, fetch user data and render the dashboard page
+    if (userLoggedIn) {
+        const userId = req.session.authen;
+        const userQuery = `SELECT * FROM User WHERE user_id = ?`;
+
+        connection.query(userQuery, [userId], (err, rows) => {
+            if (err) {
+                console.error("Error fetching user data:", err);
+                res.status(500).send("Internal Server Error");
+                return;
+            }
+            if (rows.length > 0) {
+                const firstRow = rows[0];
+                res.render('createcollection', { userLoggedIn: userLoggedIn, userData: firstRow });
+            } else {
+                res.send("User not found");
+            }
+        });
+    } else {
+        // If the user is not logged in, deny access
+        res.send("Denied - please log in.");
+    }
+});
+
+// 8. Handle POST request to create a new collection
+app.post('/createcollection', (req, res) => {
+    // Retrieve collection data from the request body
+    const collectionName = req.body.collectionName;
+    const collectionDescription = req.body.collectionDescription;
+
+    // Retrieve user ID from the session 
+    const userId = req.session.authen;
+
+    // Insert the new collection into the database
+    const insertQuery = 'INSERT INTO collection (collection_name, collection_description, user_id) VALUES (?, ?, ?)';
+    connection.query(insertQuery, [collectionName, collectionDescription, userId], (err) => {
+        if (err) {
+            console.error('Error creating new collection:', err);
+            res.status(500).send('Error creating new collection');
+            return;
+        }
+
+        // Redirect the user to a confirmation page or any other desired page
+        res.redirect('/views/usercollection');
+    });
 });
 
 
@@ -405,9 +561,13 @@ app.get('/views/account', (req, res) => {
 
 
 
-
-// 6. Update user's display name
+// 9. Update user's display name
+// Handle the PUT request to update user's display name
+//app.put('/updateUser', (req, res) => {
 app.post('/updateUser', (req, res) => {
+    console.log('PUT /updateUser route hit'); // Add this line to log when the route is hit
+    console.log('Request body:', req.body); // Add this line to log the request body
+
     const newDisplayName = req.body.newDisplayName;
     const userId = req.session.authen; // Assuming you store user ID in session
 
@@ -422,6 +582,7 @@ app.post('/updateUser', (req, res) => {
         res.redirect('/views/account'); // Redirect back to the account page after updating
     });
 });
+
 
 
 

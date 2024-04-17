@@ -7,15 +7,11 @@
       <div class="col-md-6">
         <div class="card">
           <div class="card-body">
-            <h5 class="card-title text-center mb-4">Update Display Name</h5>
-            <!-- <form id="updateDisplayNameForm" method="POST"> -->
-            <form id="updateDisplayNameForm" action="/updateUser" method="POST">
-              <input type="hidden" name="_method" value="PUT" />
-
-              <!-- Hidden input to specify PUT request -->
+            <h5 class="card-title text-center mb-4">UPDATEe</h5>
+            <form action="/updateUser" method="POST">
               <div class="mb-3">
                 <label for="newDisplayName" class="form-label"
-                  >New Display Name:</label
+                  >wrong text</label
                 >
                 <input
                   type="text"
@@ -49,19 +45,5 @@
     </div>
   </div>
 </main>
-
-<script>
-  // JavaScript to display alert after form submission
-  document
-    .getElementById("updateDisplayNameForm")
-    .addEventListener("submit", function (event) {
-      // Prevent the form from submitting normally
-      event.preventDefault();
-      // Show alert
-      alert("Success");
-      // Submit the form
-      this.submit();
-    });
-</script>
 
 <%- include("partials/footer.ejs") %>

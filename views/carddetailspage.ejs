@@ -81,6 +81,37 @@
               card.illustrator_last_name %>
             </p>
 
+            <button type="button" class="btn btn-secondary">
+              Add to Wishlist
+            </button>
+
+            <% if (userLoggedIn) { %>
+            <div class="input-group mb-3">
+              <div class="input-group-prepend">
+                <form
+                  action="/views/addtocollection/<%= card.card_id %>"
+                  method="POST"
+                >
+                  <button class="btn btn-warning" type="submit">
+                    Add to Collection
+                  </button>
+                </form>
+              </div>
+              <select
+                class="custom-select"
+                id="inputGroupSelect03"
+                name="collectionId"
+              >
+                <option selected>Choose...</option>
+                <% collections.forEach(collection => { %>
+                <option value="<%= collection.collection_id %>">
+                  <%= collection.collection_name %>
+                </option>
+                <% }); %>
+              </select>
+            </div>
+            <% } %>
+
             <!-- Add more card details here -->
           </div>
         </div>

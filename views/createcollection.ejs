@@ -1,0 +1,106 @@
+<%- include("partials/header.ejs") %>
+
+<div class="container mt-5">
+  <div class="row justify-content-center">
+    <div class="col-md-6">
+      <div id="inputContainer">
+        <form
+          id="createCollectionForm"
+          action="/createcollection"
+          method="POST"
+        >
+          <br />
+          <br />
+          <h2 class="mb-4">Create a New Collection</h2>
+          <div class="mb-3">
+            <label for="collectionName" class="form-label"
+              >Collection Name:</label
+            >
+            <input
+              id="collectionName"
+              name="collectionName"
+              type="text"
+              class="form-control"
+              placeholder="Enter collection name"
+              maxlength="30"
+              <!--
+              Add
+              maxlength
+              attribute
+              to
+              limit
+              input
+              to
+              30
+              characters
+              --
+            />
+
+            <small class="form-text text-muted">
+              <!-- Display character count -->
+              <span id="collectionNameCount">0</span>/30 characters
+            </small>
+          </div>
+          <div class="mb-3">
+            <label for="collectionDescription" class="form-label"
+              >Collection Description:</label
+            >
+            <textarea
+              id="collectionDescription"
+              name="collectionDescription"
+              class="form-control"
+              rows="4"
+              placeholder="Enter collection description (max 300 characters)"
+              maxlength="300"
+              <!--
+              Add
+              maxlength
+              attribute
+              to
+              limit
+              input
+              to
+              300
+              characters
+              --
+            ></textarea>
+            <small class="form-text text-muted">
+              <!-- Display character count -->
+              <span id="collectionDescriptionCount">0</span>/300 characters
+            </small>
+          </div>
+          <button
+            type="submit"
+            name="createCollectionButton"
+            class="btn btn-primary"
+          >
+            CREATE
+          </button>
+        </form>
+        <br />
+        <a href="/views/usercollection" class="btn btn-secondary"> Back </a>
+      </div>
+    </div>
+  </div>
+</div>
+
+<%- include("partials/footer.ejs") %>
+
+<script>
+  // Get the input element
+  const collectionDescriptionInput = document.getElementById(
+    "collectionDescription"
+  );
+  // Get the span element where character count will be displayed
+  const collectionDescriptionCountSpan = document.getElementById(
+    "collectionDescriptionCount"
+  );
+
+  // Add event listener for input event
+  collectionDescriptionInput.addEventListener("input", function () {
+    // Get the current length of the input value
+    const currentLength = collectionDescriptionInput.value.length;
+    // Update the character count display
+    collectionDescriptionCountSpan.textContent = currentLength;
+  });
+</script>
