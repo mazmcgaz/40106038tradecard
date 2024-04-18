@@ -7,6 +7,11 @@
     padding: 10px;
     margin-bottom: 20px;
     color: black;
+    height: 300px; /* Fixed height for each action item */
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
   }
 
   .action-item:hover {
@@ -15,15 +20,17 @@
   }
 
   .action-item img {
-    max-width: 90%; /* Set maximum width for images */
+    max-width: 50%; /* Set maximum width for images */
     height: auto; /* Maintain aspect ratio */
   }
 
   /* Modal styles */
   .modal-dialog {
-    max-width: 800px; /* Adjust maximum width as needed */
+    max-width: 800px; 
   }
 </style>
+
+<main>
 
 <div class="px-4 pt-5 my-5 text-center border-bottom">
   <h1 class="display-4 fw-bold text-body-emphasis">Members</h1>
@@ -59,34 +66,26 @@
 
   <div class="container">
     <div class="row">
-      <!-- Loop through all of the cards -->
-      <% rowdata.forEach((card)=> { %>
+      <!-- Loop through all of the members -->
+      <% rowdata.forEach(user => { %>
       <div class="col-md-4">
         <!-- Bootstrap column for each action item -->
-        <div
-          class="action-item"
-          onclick="window.location='/views/carddetailspage/<%= card.card_id %>'"
-        >
-          <!-- card name -->
-          <h4><%= card.card_name %></h4>
+        <div class="action-item">
+          <!-- User image -->
+          <img src="<%= user.user_image %>" alt="<%= user.user_display_name %>" />
 
-          <img src="<%= card.image_url %>" alt="<%= card.card_name %>" />
+          <!-- User display name -->
+          <h4><%= user.user_display_name %></h4>
 
-          <p>Price: $<%= card.price_market %></p>
-
-          <!-- Button to open modal -->
-          <button type="button" class="btn btn-light">Add to Wishlist</button>
-          <button type="button" class="btn btn-light">Add to Collection</button>
-
-          <!-- Add to Wishlist button -->
-          <button type="button" class="btn btn-primary">View Details</button>
+          <!-- View Collections button -->
+          <a href="/views/usercollections/<%= user.user_id %>" class="btn btn-primary">View Collections</a>
         </div>
       </div>
       <% }) %>
     </div>
   </div>
 
-  <main>
+ 
     <!-- Mainh content goes here -->
   </main>
 

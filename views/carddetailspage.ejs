@@ -89,20 +89,33 @@
             <div class="input-group mb-3">
               <div class="input-group-prepend">
                 <form
+                  id="addToCollectionForm"
                   action="/views/addtocollection/<%= card.card_id %>"
                   method="POST"
                 >
                   <button class="btn btn-warning" type="submit">
                     Add to Collection
                   </button>
+                  <!-- Hidden input field to store cardId -->
+                  <input
+                    type="hidden"
+                    name="cardId"
+                    value="<%= card.card_id %>"
+                  />
+                  <!-- Hidden input field to store collectionId -->
+                  <input
+                    type="hidden"
+                    id="collectionIdInput"
+                    name="collectionId"
+                  />
                 </form>
               </div>
               <select
                 class="custom-select"
-                id="inputGroupSelect03"
+                id="collectionSelect"
                 name="collectionId"
               >
-                <option selected>Choose...</option>
+                <option selected disabled>Choose...</option>
                 <% collections.forEach(collection => { %>
                 <option value="<%= collection.collection_id %>">
                   <%= collection.collection_name %>
@@ -136,5 +149,15 @@
     </div>
   </main>
 </div>
+
+<script>
+  document
+    .getElementById("collectionSelect")
+    .addEventListener("change", function () {
+      const collectionId = this.value; // Get the selected collection_id from the dropdown menu
+      document.getElementById("collectionIdInput").value = collectionId; // Set the value of the hidden input field
+      document.getElementById("addToCollectionForm").submit(); // Submit the form
+    });
+</script>
 
 <%- include("partials/footer.ejs") %>

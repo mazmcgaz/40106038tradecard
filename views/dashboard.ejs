@@ -16,7 +16,7 @@
 
 <div class="px-4 pt-5 my-5 text-center border-bottom">
   <h1 class="display-4 fw-bold text-body-emphasis">Dashboard</h1>
-  <h2>Welcome back,</h2>
+  <h2>Welcome back, <%= userData.user_display_name %>!</h2>
 
   <div class="container">
     <div class="row">
@@ -33,7 +33,7 @@
             <div class="col-md-3">
               <!-- Bootstrap column for each action item -->
               <div class="action-item">
-                <p>View My Card Collection</p>
+                <p>View Collections</p>
                 <a href="usercollection">Go</a>
               </div>
             </div>
@@ -56,6 +56,13 @@
               <div class="action-item">
                 <p>Account Details</p>
                 <a href="/views/account">Go</a>
+              </div>
+            </div>
+            <div class="col-md-3">
+              <!-- Bootstrap column for each action item -->
+              <div class="action-item">
+                <p>Wishlist</p>
+                <a href="">Go</a>
               </div>
             </div>
           </div>

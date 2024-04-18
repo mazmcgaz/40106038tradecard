@@ -48,12 +48,25 @@
           <!-- Collection description -->
           <p><%= collection.collection_description %></p>
 
-          <!-- Button to view collection details -->
-          <a
-            href="/views/collectiondetails/<%= collection.collection_id %>"
-            class="btn btn-primary"
-            >View Collection</a
-          >
+          <!-- Button group for view and delete buttons -->
+          <div class="d-flex justify-content-between">
+            <!-- Button to view collection details -->
+            <a
+              href="/views/collectiondetails/<%= collection.collection_id %>"
+              class="btn btn-primary"
+              >View Collection</a
+            >
+
+            <!-- Button to delete collection -->
+            <form
+              action="/views/deletecollection/<%= collection.collection_id %>"
+              method="POST"
+            >
+              <button type="submit" class="btn btn-danger">
+                Delete Collection
+              </button>
+            </form>
+          </div>
         </div>
       </div>
       <% }) %>

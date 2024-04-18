@@ -124,9 +124,14 @@ app.get('/views/allcards', (req, res) => {
 
 
 
+
+
 // Route to fetch card details and render the card details page 
 app.get('/views/carddetailspage/:id', (req, res) => {
     const cardId = req.params.id;
+
+// print out the cardId
+console.log('Received cardId:', cardId);
 
     // Fetch card details
     const cardQuery = `
@@ -204,6 +209,60 @@ app.get('/views/carddetailspage/:id', (req, res) => {
 });
 
 
+
+// Show all users route
+app.get('/views/allusers', (req, res) => {
+    // Check if the user is logged in
+    const userLoggedIn = req.session.authen ? true : false;
+
+    // Fetch all users from the database
+    const usersQuery = `SELECT user_id, user_display_name, user_image FROM User`;
+    connection.query(usersQuery, (err, rows) => {
+        if (err) {
+            console.error("Error fetching users:", err);
+            res.status(500).send("Internal Server Error");
+            return;
+        }
+
+        // Render different navigation bars based on user login status
+        if (userLoggedIn) {
+            // If the user is logged in, render the navigation bar for logged-in users
+            res.render('allusers', { title: 'All Users:', rowdata: rows, userLoggedIn: true });
+        } else {
+            // If the user is not logged in, render the navigation bar for logged-out users
+            res.render('allusers', { title: 'All Users:', rowdata: rows, userLoggedIn: false });
+        }
+    });
+});
+
+
+
+// view all the cards in each individual collection belonging to a user
+app.get('/views/wishlist/:id', (req, res) => {
+    // Check if the user is logged in
+    const userLoggedIn = req.session.authen ? true : false;
+
+    const wishlistId = req.params.id;
+    const collectionQuery = `
+    SELECT , card.card_id, card.card_name, card.image_url
+    FROM collection_card
+    JOIN card ON collection_card.card_id = card.card_id
+    WHERE collection_card.collection_id =  ?`;
+
+    connection.query(collectionQuery, [wishlistId], (err, rows) => {
+        if (err) {
+            console.error('Error fetching card details:', err);
+            res.status(500).send('Error fetching card details');
+            return;
+        }
+
+        // Pass userLoggedIn status to the template
+        res.render('wishlist', { cards: rows, userLoggedIn: userLoggedIn });
+    });
+});
+
+
+
 // view all the cards in each individual collection belonging to a user
 app.get('/views/collectiondetails/:id', (req, res) => {
     // Check if the user is logged in
@@ -211,9 +270,9 @@ app.get('/views/collectiondetails/:id', (req, res) => {
 
     const collectionId = req.params.id;
     const collectionQuery = `
-    SELECT card.card_id, card.card_name, card.image_url
-    FROM card
-    JOIN collection_card ON card.card_id = collection_card.card_id
+    SELECT collection_card.collection_card_id, card.card_id, card.card_name, card.image_url
+    FROM collection_card
+    JOIN card ON collection_card.card_id = card.card_id
     WHERE collection_card.collection_id =  ?`;
 
     connection.query(collectionQuery, [collectionId], (err, rows) => {
@@ -229,36 +288,78 @@ app.get('/views/collectiondetails/:id', (req, res) => {
 });
 
 
+// Delete a collection
+app.post('/views/deletecollection/:id', (req, res) => {
+    // Check if the user is logged in
+    if (!req.session.authen) {
+        res.status(401).send('Unauthorised ??');
+        return;
+    }
+
+    // Extract the collection ID from the request parameters
+    const collectionId = req.params.id;
+
+    // Query to delete the collection
+    const deleteCollectionQuery = 'DELETE FROM collection WHERE collection_id = ?';
+
+    // Execute the query
+    connection.query(deleteCollectionQuery, [collectionId], (err, result) => {
+        if (err) {
+            console.error('Error deleting collection:', err);
+            res.status(500).send('Error deleting collection');
+            return;
+        }
+
+         // Check if any rows were affected
+         if (result.affectedRows === 0) {
+            res.status(404).send('Collection not found');
+            return;
+        }
+
+        // Redirect the user back to the user collection page
+        res.redirect('/dashboard'); 
+    });
+});
 
 
 
 // add a card to a collection
-app.get('/views/addtocollection/:id', (req, res) => {
+app.post('/views/addtocollection/:id', (req, res) => {
     // Check if the user is logged in
-    const userLoggedIn = req.session.authen ? true : false;
+    if (!req.session.authen) {
+        // If user is not logged in, redirect to the login page or show an error message
+        res.redirect('/views/login'); // Adjust the route as per your application's login page
+        return;
+    }
 
-    const collectionId = req.params.id; // Retrieve collectionId from the URL parameter
-    const collectionQuery = `
-    SELECT card.card_id, card.card_name, card.image_url
-    FROM card
-    JOIN collection_card ON card.card_id = collection_card.card_id
-    WHERE collection_card.collection_id =  ?`;
-    
-    connection.query(collectionQuery, [collectionId], (err, rows) => {
+    // gets the collectionId from the request body
+    const collectionId = req.body.collectionId; 
+
+    // gets the cardId from the request body
+    const cardId = req.body.cardId;
+
+    // checks if these have been got correctly
+    console.log('Received collectionId:', collectionId);
+    console.log('Received cardId:', cardId);
+
+    if (!cardId) {
+        console.error('Card ID is undefined');
+        res.status(400).send('Card ID is missing');
+        return;
+    }
+
+    const insertQuery = 'INSERT INTO collection_card (collection_id, card_id) VALUES (?, ?)';
+    connection.query(insertQuery, [collectionId, cardId], (err, result) => {
         if (err) {
-            console.error('Error fetching card details:', err);
-            res.status(500).send('Error fetching card details');
+            console.error('Error adding card to collection:', err);
+            res.status(500).send('Error adding card to collection');
             return;
         }
-
-        if (rows.length === 0) {
-            res.status(404).send('Unable to load page');
-            return;
-        }
-
-        res.render('addtocollection', { cards: rows, userLoggedIn: userLoggedIn, collectionId: collectionId }); // Pass collectionId to the template
+        
+        res.redirect(`/views/carddetailspage/${cardId}`);
     });
 });
+
 
 
 
@@ -283,16 +384,26 @@ app.post('/fav',  (req, res) => {
 });
 
 app.get('/views/blog',  (req, res) => {
-    res.render('blog');
+    // Check if the user is logged in
+    const userLoggedIn = req.session.authen ? true : false;
+
+    res.render('blog', { userLoggedIn });
 });
 
 // app.get('/views/account',  (req, res) => {
 //     res.render('account');
 // });
 
-app.get('/views/howtoplay',  (req, res) => {
-    res.render('howtoplay');
+// Show how to play route
+app.get('/views/howtoplay', (req, res) => {
+    // Check if the user is logged in
+    const userLoggedIn = req.session.authen ? true : false;
+
+    // Render the howtoplay page, passing the userLoggedIn status
+    res.render('howtoplay', { userLoggedIn });
 });
+
+
 
 app.get('/views/login',  (req, res) => {
     res.render('login');
@@ -302,9 +413,9 @@ app.get('/views/register',  (req, res) => {
     res.render('register');
 });
 
-app.get('/views/carddetailspage',  (req, res) => {
-    res.render('carddetailspage');
-});
+// app.get('/views/carddetailspage',  (req, res) => {
+//     res.render('carddetailspage');
+// });
 
 
 app.get('/views/signup',  (req, res) => {
@@ -319,7 +430,7 @@ app.get('/views/newmember',  (req, res) => {
     res.render('newmember');
 });
 
-// 1. a new user signing up and becoming a member 
+// 1. a user signing up and becoming a new member 
 app.post('/newmember', (req, res) => {
     const email = req.body.registerEmail;
     const password = req.body.registerPassword;
@@ -346,9 +457,11 @@ app.post('/newmember', (req, res) => {
 
                 console.log('Hashed Password:', hash);
 
-                const insertQuery = 'INSERT INTO User (user_display_name, user_email, user_password, user_first_name, user_last_name, user_role) VALUES (?, ?, ?, ?, ?, ?)';
+                const insertQuery = 'INSERT INTO User (user_display_name, user_email, user_password, user_first_name, user_last_name, user_role, user_image) VALUES (?, ?, ?, ?, ?, ?, ?)';
                 const userRole = 'member'; // Default role for new users
-                connection.query(insertQuery, [firstname, email, hash, firstname, lastname, userRole], (err) => {
+                const userImage= 'https://pngimg.com/uploads/pokemon/pokemon_PNG93.png'; 
+
+                connection.query(insertQuery, [firstname, email, hash, firstname, lastname, userRole, userImage], (err) => {
                     if (err) {
                         console.error('Error inserting new user:', err);
                         res.status(500).send('Error inserting new user');
@@ -373,7 +486,6 @@ app.get('/views/login', (req, res) => {
 app.post("/views/login", async (req, res) => {
     const loginEmail = req.body.loginEmail;
     const loginPassword = req.body.loginPassword;
-
     try {
         const result = await queryAsync("SELECT * FROM User WHERE user_email = ?", [loginEmail]);
 
@@ -423,7 +535,7 @@ app.get('/views/dashboard', (req, res) => {
     // If the user is logged in, fetch user data and render the dashboard page
     if (userLoggedIn) {
         const userId = req.session.authen;
-        const userQuery = `SELECT * FROM User WHERE user_id = ?`;
+        const userQuery = `SELECT user_id, user_display_name, user_email, user_password, user_first_name, user_last_name, user_role, user_image FROM User WHERE user_id = ?`;
 
         connection.query(userQuery, [userId], (err, rows) => {
             if (err) {
@@ -583,6 +695,35 @@ app.post('/updateUser', (req, res) => {
     });
 });
 
+
+
+// 10. delete a single card from a user's collection
+// Define the DELETE route
+app.delete('/views/deletefromcollection/:collectionCardId', (req, res) => {
+    // Extract the collection card ID from the request parameters
+    const collectionCardId = req.params.collectionCardId;
+
+    // Query to delete the card from the collection based on the collection card ID
+    const deleteFromCollectionQuery = 'DELETE FROM collection_card WHERE collection_card_id = ?';
+
+    // Execute the query
+    connection.query(deleteFromCollectionQuery, [collectionCardId], (err, result) => {
+        if (err) {
+            console.error('Error deleting card from collection:', err);
+            res.status(500).send('Error deleting card from collection');
+            return;
+        }
+
+        // Check if any rows were affected
+        if (result.affectedRows === 0) {
+            res.status(404).send('Collection card not found');
+            return;
+        }
+
+        // Send a success response
+        res.status(200).send('Card deleted from collection successfully');
+    });
+});
 
 
 

@@ -79,6 +79,23 @@
               alt="<%= card.card_name %>"
               class="card-image"
             />
+
+            <!-- Button container for two buttons -->
+            <div class="button-container">
+              <!-- View details button -->
+              <button type="button" class="btn btn-primary">
+                View Details
+              </button>
+              <!-- Delete from collection button -->
+
+              <button
+                type="button"
+                class="btn btn-danger"
+                onclick="deleteFromCollection('<%= card.collection_card_id %>')"
+              >
+                Delete from Collection
+              </button>
+            </div>
           </div>
         </div>
         <% }) %> <% } %>
@@ -86,5 +103,32 @@
     </div>
   </main>
 </div>
+
+<script>
+  function deleteFromCollection(collectionCardId) {
+    if (
+      confirm("Are you sure you want to delete this card from the collection?")
+    ) {
+      // Make an AJAX request to delete the card from the collection
+      fetch(`/views/deletefromcollection/${collectionCardId}`, {
+        method: "DELETE",
+      })
+        .then((response) => {
+          if (response.ok) {
+            // Reload the page to reflect the changes
+            location.reload();
+          } else {
+            throw new Error("Failed to delete card from collection");
+          }
+        })
+        .catch((error) => {
+          console.error(error);
+          alert(
+            "An error occurred while deleting the card from the collection"
+          );
+        });
+    }
+  }
+</script>
 
 <%- include("partials/footer.ejs") %>
