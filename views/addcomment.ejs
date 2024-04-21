@@ -1,0 +1,31 @@
+<%- include("partials/header.ejs") %>
+
+<main class="container">
+  <h1 class="mt-5">Add Comment</h1>
+
+  <% if (userLoggedIn) { %>
+  <form
+    action="/views/addcomment/<%= collectionId %>"
+    method="post"
+    class="mt-4"
+  >
+    <div class="mb-3">
+      <label for="commentContent" class="form-label"
+        >Enter your comment here:</label
+      >
+      <textarea
+        name="comment_content"
+        id="commentContent"
+        class="form-control"
+        rows="4"
+        placeholder="Enter your comment here"
+      ></textarea>
+    </div>
+    <button type="submit" class="btn btn-primary">Submit</button>
+  </form>
+  <% } else { %>
+  <p class="mt-4">Please log in to leave a comment.</p>
+  <% } %>
+</main>
+
+<%- include("partials/footer.ejs") %>

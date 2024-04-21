@@ -176,8 +176,8 @@ console.log('Received cardId:', cardId);
 
     connection.query(cardQuery, [cardId], (err, rows) => {
         if (err) {
-            console.error('Error fetching card details:', err);
-            res.status(500).send('Error fetching card details');
+            console.error('5) Error fetching card details:', err);
+            res.status(500).send('6) Error fetching card details');
             return;
         }
 
@@ -235,57 +235,264 @@ app.get('/views/allusers', (req, res) => {
     });
 });
 
-
-
-// view all the cards in each individual collection belonging to a user
-app.get('/views/wishlist/:id', (req, res) => {
+// member who's logged in views collection of a different member
+app.get('/views/alluserscollections/:userId', (req, res) => {
     // Check if the user is logged in
     const userLoggedIn = req.session.authen ? true : false;
 
-    const wishlistId = req.params.id;
-    const collectionQuery = `
-    SELECT , card.card_id, card.card_name, card.image_url
-    FROM collection_card
-    JOIN card ON collection_card.card_id = card.card_id
-    WHERE collection_card.collection_id =  ?`;
+    
+    // ** i just removed this
+    // const userId = req.params.userId;
 
-    connection.query(collectionQuery, [wishlistId], (err, rows) => {
+    // Fetch the ID of the user whose collections are being viewed
+    const viewedMemberId = req.params.userId;
+
+    // get collections data for the member along with their display name
+    const collectionsQuery = `
+        SELECT u.user_display_name, c.collection_name, c.collection_description, c.collection_id
+        FROM collection c
+        INNER JOIN User u ON c.user_id = u.user_id
+        WHERE c.user_id = ?
+    `;
+
+    connection.query(collectionsQuery, [viewedMemberId], (err, rows) => {
         if (err) {
-            console.error('Error fetching card details:', err);
-            res.status(500).send('Error fetching card details');
+            console.error("Error fetching user collections:", err);
+            res.status(500).send("Internal Server Error");
             return;
         }
-
-        // Pass userLoggedIn status to the template
-        res.render('wishlist', { cards: rows, userLoggedIn: userLoggedIn });
+        // Render the alluserscollections view with user collections data and the viewed member's display name
+        res.render('alluserscollections', { userLoggedIn: userLoggedIn, collections: rows, viewedMemberDisplayName: rows.length > 0 ? rows[0].user_display_name : '', userId: req.params.userId });
     });
 });
 
 
+// view all the cards belonging to a different member's collection
+
+app.get('/views/alluserscollectionsdetails/:userId/collection/:collectionId', (req, res) => {
+    try {
+        // Check if the user is logged in
+        const userLoggedIn = req.session.authen ? true : false;
+
+        
+
+
+        // Query to fetch all the cards belonging to the specified collection for a different user
+        const cardQuery = `
+        SELECT collection_card.collection_card_id, collection_card.collection_id, collection.user_id, card.card_id, card.card_name, card.image_url
+        FROM collection_card
+        JOIN collection ON collection_card.collection_id = collection.collection_id
+        JOIN card ON collection_card.card_id = card.card_id
+        WHERE collection_card.collection_id = ?`;
+         
+
+        const userId = req.params.userId;
+        const collectionId = req.params.collectionId;
+
+        // Log userId and collectionId
+        console.log('userId:', userId);
+        console.log('collectionId:', collectionId);
+
+        connection.query(cardQuery, [collectionId], (err, rows) => {
+            if (err) {
+                console.error('7) Error fetching card details:', err);
+                res.status(500).send('8) Error fetching card details');
+                return;
+            }
+
+             // Log fetched card details
+             console.log('Fetched card details:', rows);
+
+            // Render the alluserscollectionsdetails with the card details and parameters
+            res.render('alluserscollectionsdetails', { 
+                cards: rows, 
+                userLoggedIn: userLoggedIn,
+                userId: userId,
+                collectionId: collectionId
+            });
+        });
+    } catch (error) {
+        console.error('Error in route handler:', error);
+        res.status(500).send('Internal Server Error');
+    }
+});
+
+
+
+
+
+
+
+
+
+// view all the cards in each individual WISHLIST belonging to a user
+// Route to display cards in the user's wishlist
+app.get('/views/wishlist', (req, res) => {
+    // Check if the user is logged in
+    if (!req.session.authen) {
+        // If user is not logged in, redirect to the login page or show an error message
+        res.redirect('/views/login'); // Adjust the route as per your application's login page
+        return;
+    }
+
+    const userLoggedIn = req.session.authen ? true : false;
+    const userId = req.session.authen; // Get the logged-in user's ID from the session
+
+    // Query to retrieve card details from the user's wishlist
+    const wishlistQuery = `
+        SELECT card.card_id, card.card_name, card.image_url
+        FROM wishlist
+        JOIN card ON wishlist.card_id = card.card_id
+        WHERE wishlist.user_id = ?
+    `;
+
+    connection.query(wishlistQuery, [userId], (err, rows) => {
+        if (err) {
+            console.error('Error fetching wishlist:', err);
+            res.status(500).send('Error fetching wishlist');
+            return;
+        }
+
+        // Pass user's wishlist data to the view for rendering
+        res.render('wishlist', { cards: rows });
+    });
+});
+
+
+app.get('/views/back', (req, res) => {
+    // Get the referer URL from the request headers
+    const referer = req.headers.referer;
+
+    // If the referer is available, redirect the user back to that page
+    if (referer) {
+        res.redirect(referer);
+    } else {
+        // If the referer is not available, redirect the user to a default page
+        res.redirect('/');
+    }
+});
+
+
+
+
+// Route for displaying comments
+app.get('/views/comments/:collectionId', (req, res) => {
+    // Check if the user is logged in
+    const userLoggedIn = req.session.authen ? true : false;
+
+    // Redirect to login page if user is not logged in
+    if (!userLoggedIn) {
+        return res.redirect('/views/login');
+    }
+
+    // Get the collection ID from the route parameters
+    const collectionId = req.params.collectionId;
+
+    // Query to fetch comments for the specified collection
+    const commentsQuery = `
+        SELECT Comment.*, User.user_display_name
+        FROM Comment
+        JOIN User ON Comment.user_id = User.user_id
+        WHERE Comment.collection_id = ?
+    `;
+
+    // Execute the query
+    connection.query(commentsQuery, [collectionId], (err, comments) => {
+        if (err) {
+            console.error('Error fetching comments:', err);
+            res.status(500).send('Error fetching comments');
+            return;
+        }
+
+        // Render the comments page with the fetched comments
+        res.render('comments', { comments: comments, userLoggedIn: userLoggedIn });
+    });
+});
+
+
+// view all the cards in each individual collection belonging to a user
 
 // view all the cards in each individual collection belonging to a user
 app.get('/views/collectiondetails/:id', (req, res) => {
     // Check if the user is logged in
     const userLoggedIn = req.session.authen ? true : false;
+    console.log('userLoggedIn:', userLoggedIn);
+
+    // Get the ID of the logged-in user
+  //  const loggedInUserId = req.session.userId;
+    const userId = req.session.authen;
+    console.log('loggedInUserId:', userId);
 
     const collectionId = req.params.id;
     const collectionQuery = `
-    SELECT collection_card.collection_card_id, card.card_id, card.card_name, card.image_url
+    SELECT collection_card.collection_card_id, card.card_id, card.card_name, card.image_url,  collection.user_id  
     FROM collection_card
     JOIN card ON collection_card.card_id = card.card_id
+    JOIN collection ON collection_card.collection_id = collection.collection_id
     WHERE collection_card.collection_id =  ?`;
 
     connection.query(collectionQuery, [collectionId], (err, rows) => {
         if (err) {
-            console.error('Error fetching card details:', err);
-            res.status(500).send('Error fetching card details');
+            console.error('3) Error fetching card details:', err);
+            res.status(500).send('4) Error fetching card details');
             return;
         }
 
-        // Pass userLoggedIn status to the template
-        res.render('collectiondetails', { cards: rows, userLoggedIn: userLoggedIn });
+        // Log the query results for debugging
+        console.log('Query results:', rows);
+
+       // Pass userLoggedIn status and logged-in user's ID to the template
+        // user ID associated with the collection is retrieved 
+        const collectionOwnerId = rows.length > 0 ? rows[0].user_id : null;
+
+       res.render('collectiondetails', { cards: rows, userLoggedIn: userLoggedIn, collectionOwnerId: collectionOwnerId, loggedInUserId: userId,
+        collectionId: collectionId, });
     });
 });
+
+
+// Route for showing the comment form for a specific collection
+app.get('/views/addcomment/:collectionId', (req, res) => {
+
+    // Check if the user is logged in
+    const userLoggedIn = req.session.authen ? true : false;
+    // Pass userLoggedIn status and collection ID to the template
+    res.render('addcomment', { userLoggedIn: userLoggedIn, collectionId: req.params.collectionId });
+});
+
+
+// Route for handling comment submission
+app.post('/views/addcomment/:collectionId', (req, res) => {
+    // Check if the user is logged in
+    if (!req.session.authen) {
+        // If user is not logged in, redirect to the login page or show an error message
+        res.redirect('/views/login'); // Adjust the route as per your application's login page
+        return;
+    }
+
+    // Get the user ID from the session
+    const userId = req.session.authen;
+
+    // Get comment content from the form
+    const commentContent = req.body.comment_content;
+
+    // Get the collection ID from the route parameters
+    const collectionId = req.params.collectionId;
+
+    // Insert the comment into the database
+    const insertCommentQuery = 'INSERT INTO Comment (collection_id, user_id, comment_text) VALUES (?, ?, ?)';
+    connection.query(insertCommentQuery, [collectionId, userId, commentContent], (err, result) => {
+        if (err) {
+            console.error('Error inserting comment:', err);
+            res.status(500).send('Error inserting comment');
+            return;
+        }
+        // Redirect to the collection details page after comment submission
+        res.redirect(`/views/collectiondetails/${collectionId}`);
+    });
+});
+
+
 
 
 // Delete a collection
@@ -361,13 +568,45 @@ app.post('/views/addtocollection/:id', (req, res) => {
 });
 
 
+// add a card to a wishlist
+app.post('/views/addtowishlist/:id', (req, res) => {
 
+     // Check if the user is logged in
+     if (!req.session.authen) {
 
+        // If user is not logged in, redirect to the login page or show an error message
+        res.redirect('/views/login'); // Adjust the route as per your application's login page
+        return;
+    }
 
+    // Get the user ID from the session
+    const userId = req.session.authen;
 
+    // gets the cardId from the request body
+    const cardId = req.body.cardId;
 
+    // checks if these have been got correctly
+    
+    console.log('Received cardId:', cardId);
+    console.log('Received userId:', userId);
 
-
+    if (!cardId) {
+        console.error('Card ID is undefined');
+        res.status(400).send('Card ID is missing');
+        return;
+    }
+    const insertQuery = 'INSERT INTO wishlist (user_id, card_id) VALUES (?, ?)';
+    connection.query(insertQuery, [userId, cardId], (err, result) => {
+        if (err) {
+            console.error('Error adding card to wishlist:', err);
+            res.status(500).send('Error adding card to wishlist');
+            return;
+        }
+        
+        res.redirect(`/views/wishlist`);
+    });
+    
+});
 
 
 
@@ -486,36 +725,43 @@ app.get('/views/login', (req, res) => {
 app.post("/views/login", async (req, res) => {
     const loginEmail = req.body.loginEmail;
     const loginPassword = req.body.loginPassword;
+
+    console.log("Received login credentials:", loginEmail);
+
     try {
-        const result = await queryAsync("SELECT * FROM User WHERE user_email = ?", [loginEmail]);
+        const result = await queryAsync("SELECT user_id, user_email, user_first_name, user_last_name, user_role, user_password FROM User WHERE user_email = ?", [loginEmail]);
 
         if (result.length > 0) {
             const user = result[0];
             const storedHashedPassword = String(user.user_password);
 
+            // Authenticate user
+            console.log("User authenticated, setting session:", user.user_id);
+
             // verifying the password
-            bcrypt.compare(loginPassword, storedHashedPassword, (err, result) => {
+            bcrypt.compare(loginPassword, storedHashedPassword, (err, passwordMatch) => {
                 if (err) {
                     console.error("Error comparing passwords:", err);
+                    res.status(500).send("Internal Server Error");
+                    return;
+                }
+                if (passwordMatch) {
+                    req.session.authen = user.user_id; // Set user ID in session upon successful login
+                    res.redirect('/views/dashboard');
                 } else {
-                    if (result) {
-                        req.session.authen = user.user_id; // Set user ID in session upon successful login
-                        res.redirect('/views/dashboard');
-
-                       //  res.render("dashboard");
-                    } else {
-                        res.send("<script>alert('Incorrect password'); window.location='/views/login';</script>");
-                        //res.send("Incorrect Password");
-                    }
+                    res.status(401).send("<script>alert('Incorrect password'); window.location='/views/login';</script>");
                 }
             });
         } else {
-            res.send("User not found");
+            res.status(404).send("User not found");
         }
     } catch (err) {
-        console.log(err);
+        console.error("Error logging in:", err);
+        res.status(500).send("Internal Server Error");
     }
+   
 });
+
 
 // Logout route
 app.get("/logout", (req, res) => {
@@ -587,7 +833,7 @@ app.get('/views/account', (req, res) => {
 });
 
 
-// 6. user collection page
+
 // 6. user collection page
 app.get('/views/usercollection', (req, res) => {
     // Check if the user is logged in

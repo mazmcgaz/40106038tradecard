@@ -1,0 +1,28 @@
+<%- include("partials/header.ejs") %>
+
+<main>
+  <div class="container">
+    <div class="row">
+      <div class="col-md-12">
+        <h1>Card Details</h1>
+        <% if (card) { %>
+        <div class="card">
+          <img
+            src="<%= card.image_url %>"
+            class="card-img-top"
+            alt="<%= card.card_name %>"
+          />
+          <div class="card-body">
+            <h5 class="card-title"><%= card.card_name %></h5>
+            <p class="card-text">Card ID: <%= card.card_id %></p>
+          </div>
+        </div>
+        <% } else { %>
+        <p>No card details found.</p>
+        <% } %>
+      </div>
+    </div>
+  </div>
+</main>
+
+<%- include("partials/footer.ejs") %>

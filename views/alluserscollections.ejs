@@ -1,0 +1,68 @@
+<%- include("partials/header.ejs") %>
+
+<style>
+  .action-item {
+    background-color: #96cc6a;
+    border: 1px solid #ced4da;
+    padding: 10px;
+    margin-bottom: 10px;
+    color: black;
+  }
+
+  .action-item:hover {
+    background-color: #cde6b8;
+  }
+</style>
+
+<main>
+  <div class="px-4 pt-5 my-5 text-center border-bottom">
+    <h1 class="display-4 fw-bold text-body-emphasis">Collections</h1>
+    <h2>You can rate, comment, or like this member's collections.</h2>
+
+    <div class="container">
+      <div class="row">
+        <div class="card-body text-center">
+          <a href="/views/allusers" class="btn btn-primary back-to-cards-button"
+            >Back to Members</a
+          >
+        </div>
+      </div>
+    </div>
+    <!-- Grey separation line -->
+    <hr class="my-4" />
+
+    <div class="container">
+      <div class="row">
+        <!-- Loop through all of the collections -->
+        <% collections.forEach((collection) => { %>
+        <div class="col-md-4">
+          <!-- Bootstrap column for each action item -->
+          <div class="card mb-3">
+            <div class="card-body">
+              <!-- Collection name -->
+              <h4><%= collection.collection_name %></h4>
+
+              <!-- Collection description -->
+              <p><%= collection.collection_description %></p>
+
+              <!-- Button group for view and delete buttons -->
+
+              <a
+                href="/views/collectiondetails/<%= collection.collection_id %>"
+                class="btn btn-primary"
+                >View Collection</a
+              >
+
+              <!-- Output collection.user_id and collection.collection_id for debugging -->
+              <%- console.log("User ID:", userId, "Collection ID:",
+              collection.collection_id) %>
+            </div>
+          </div>
+        </div>
+        <% }) %>
+      </div>
+    </div>
+  </div>
+</main>
+
+<%- include("partials/footer.ejs") %>

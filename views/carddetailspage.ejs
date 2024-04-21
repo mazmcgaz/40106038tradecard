@@ -81,11 +81,25 @@
               card.illustrator_last_name %>
             </p>
 
-            <button type="button" class="btn btn-secondary">
-              Add to Wishlist
-            </button>
-
             <% if (userLoggedIn) { %>
+
+            <form
+              id="addToWishlistForm"
+              action="/views/addtowishlist/<%= card.card_id %>"
+              method="POST"
+            >
+              <button
+                id="addToWishlistButton"
+                type="submit"
+                class="btn btn-info"
+              >
+                Add to Wishlist
+              </button>
+
+              <!-- Hidden input field to store cardId -->
+              <input type="hidden" name="cardId" value="<%= card.card_id %>" />
+            </form>
+
             <div class="input-group mb-3">
               <div class="input-group-prepend">
                 <form
@@ -151,13 +165,25 @@
 </div>
 
 <script>
+  // for adding a card to a collection
   document
     .getElementById("collectionSelect")
     .addEventListener("change", function () {
       const collectionId = this.value; // Get the selected collection_id from the dropdown menu
+
       document.getElementById("collectionIdInput").value = collectionId; // Set the value of the hidden input field
       document.getElementById("addToCollectionForm").submit(); // Submit the form
     });
+
+  // for adding a card to a user's wishlist
+  document.addEventListener("DOMContentLoaded", function () {
+    const addToWishlistButton = document.getElementById("addToWishlistButton");
+    addToWishlistButton.addEventListener("click", function (event) {
+      event.preventDefault(); // Prevent the default form submission
+      const form = document.getElementById("addToWishlistForm");
+      form.submit(); // Submit the form
+    });
+  });
 </script>
 
 <%- include("partials/footer.ejs") %>

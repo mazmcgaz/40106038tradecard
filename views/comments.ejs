@@ -1,0 +1,29 @@
+<%- include("partials/header.ejs") %>
+
+<main class="container">
+  <h1 class="mt-5 mb-4">Comments</h1>
+
+  <!-- Go back button -->
+  <form action="/views/back" method="GET" class="mb-4">
+    <button type="submit" class="btn btn-primary">Go Back</button>
+  </form>
+
+  <% if (comments.length === 0) { %>
+  <!-- No comments alert -->
+  <div class="alert alert-info" role="alert">No comments yet.</div>
+  <% } else { %>
+  <!-- List of comments -->
+  <ul class="list-group">
+    <% comments.forEach((comment) => { %>
+    <li class="list-group-item">
+      <div class="d-flex align-items-center">
+        <strong class="mr-2"><%= comment.user_display_name %>:</strong>
+        <span><%= comment.comment_text %></span>
+      </div>
+    </li>
+    <% }) %>
+  </ul>
+  <% } %>
+</main>
+
+<%- include("partials/footer.ejs") %>

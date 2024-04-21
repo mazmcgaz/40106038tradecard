@@ -62,6 +62,21 @@
     </div>
     <% } %>
 
+    <!-- Link to add comment -->
+    <% if (userLoggedIn) { %>
+    <a href="/views/addcomment/<%= collectionId %>" class="btn btn-primary"
+      >Add Comment</a
+    >
+    <% } %>
+
+    <!-- Button to navigate to comments page -->
+    <a href="/views/comments/<%= collectionId %>" class="btn btn-info">
+      View Comments
+    </a>
+
+    <!-- Grey separation line -->
+    <hr class="my-4" />
+
     <!-- Display card details -->
     <div class="container">
       <div class="row">
@@ -86,8 +101,9 @@
               <button type="button" class="btn btn-primary">
                 View Details
               </button>
-              <!-- Delete from collection button -->
 
+              <!-- Delete from collection button -->
+              <% if (userLoggedIn && card.user_id === loggedInUserId) { %>
               <button
                 type="button"
                 class="btn btn-danger"
@@ -95,6 +111,7 @@
               >
                 Delete from Collection
               </button>
+              <% } %>
             </div>
           </div>
         </div>

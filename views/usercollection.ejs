@@ -14,64 +14,68 @@
   }
 </style>
 
-<div class="px-4 pt-5 my-5 text-center border-bottom">
-  <h1 class="display-4 fw-bold text-body-emphasis">Your Collections</h1>
-  <h2>View your collections below:</h2>
+<main>
+  <div class="px-4 pt-5 my-5 text-center border-bottom">
+    <h1 class="display-4 fw-bold text-body-emphasis">Your Collections</h1>
+    <h2>View your collections below:</h2>
 
-  <div class="container">
-    <div class="row">
-      <div class="col-md-6 text-center">
-        <a href="/views/dashboard" class="btn btn-primary back-to-cards-button"
-          >Back to Dashboard</a
-        >
-      </div>
-      <div class="col-md-6 text-center">
-        <a href="/views/createcollection" class="btn btn-success"
-          >Create New Collection</a
-        >
-      </div>
-    </div>
-  </div>
-  <!-- Grey separation line -->
-  <hr class="my-4" />
-
-  <div class="container">
-    <div class="row">
-      <!-- Loop through all of the collections -->
-      <% collections.forEach((collection) => { %>
-      <div class="col-md-4">
-        <!-- Bootstrap column for each action item -->
-        <div class="action-item">
-          <!-- Collection name -->
-          <h4><%= collection.collection_name %></h4>
-
-          <!-- Collection description -->
-          <p><%= collection.collection_description %></p>
-
-          <!-- Button group for view and delete buttons -->
-          <div class="d-flex justify-content-between">
-            <!-- Button to view collection details -->
-            <a
-              href="/views/collectiondetails/<%= collection.collection_id %>"
-              class="btn btn-primary"
-              >View Collection</a
-            >
-
-            <!-- Button to delete collection -->
-            <form
-              action="/views/deletecollection/<%= collection.collection_id %>"
-              method="POST"
-            >
-              <button type="submit" class="btn btn-danger">
-                Delete Collection
-              </button>
-            </form>
-          </div>
+    <div class="container">
+      <div class="row">
+        <div class="col-md-6 text-center">
+          <a
+            href="/views/dashboard"
+            class="btn btn-primary back-to-cards-button"
+            >Back to Dashboard</a
+          >
+        </div>
+        <div class="col-md-6 text-center">
+          <a href="/views/createcollection" class="btn btn-success"
+            >Create New Collection</a
+          >
         </div>
       </div>
-      <% }) %>
+    </div>
+    <!-- Grey separation line -->
+    <hr class="my-4" />
+
+    <div class="container">
+      <div class="row">
+        <!-- Loop through all of the collections -->
+        <% collections.forEach((collection) => { %>
+        <div class="col-md-4">
+          <!-- Bootstrap column for each action item -->
+          <div class="action-item">
+            <!-- Collection name -->
+            <h4><%= collection.collection_name %></h4>
+
+            <!-- Collection description -->
+            <p><%= collection.collection_description %></p>
+
+            <!-- Button group for view and delete buttons -->
+            <div class="d-flex justify-content-between">
+              <!-- Button to view collection details -->
+              <a
+                href="/views/collectiondetails/<%= collection.collection_id %>"
+                class="btn btn-primary"
+                >View Collection</a
+              >
+
+              <!-- Button to delete collection -->
+              <form
+                action="/views/deletecollection/<%= collection.collection_id %>"
+                method="POST"
+              >
+                <button type="submit" class="btn btn-danger">
+                  Delete Collection
+                </button>
+              </form>
+            </div>
+          </div>
+        </div>
+        <% }) %>
+      </div>
     </div>
   </div>
-</div>
+</main>
 
 <%- include("partials/footer.ejs") %>
