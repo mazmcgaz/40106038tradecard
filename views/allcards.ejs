@@ -57,6 +57,77 @@
   </div>
   <% } %>
 
+  <div>
+    <!-- filtering by name -->
+    <p>Order by:</p>
+    <a href="/views/allcards/filter?sort=card_name" class="btn btn-secondary">
+      Name
+    </a>
+    <a
+      href="/views/allcards/filter?sort=price_market&order=desc"
+      class="btn btn-secondary"
+    >
+      Price (High to Low)
+    </a>
+    <a
+      href="/views/allcards/filter?sort=price_market&order=asc"
+      class="btn btn-secondary"
+    >
+      Price (Low to High)
+    </a>
+
+    <!-- Filter EXPANSION-->
+    <p>Filter by Expansion:</p>
+    <a href="/views/allcards/filter?expansion_id=3" class="btn btn-secondary"
+      >Team Rocket</a
+    >
+    <a href="/views/allcards/filter?expansion_id=5" class="btn btn-secondary"
+      >Fossil</a
+    >
+    <a href="/views/allcards/filter?expansion_id=6" class="btn btn-secondary"
+      >Jungle</a
+    >
+    <a href="/views/allcards/filter?expansion_id=7" class="btn btn-secondary"
+      >Base Set</a
+    >
+    <a href="/views/allcards/filter?expansion_id=9" class="btn btn-secondary"
+      >Sword & Shield</a
+    >
+
+    <!-- Filter by RARITY -->
+    <p>Filter by Rarity:</p>
+    <a href="/views/allcards/filter?rarity_id=1" class="btn btn-secondary"
+      >Common</a
+    >
+    <a href="/views/allcards/filter?rarity_id=2" class="btn btn-secondary"
+      >Uncommon</a
+    >
+    <a href="/views/allcards/filter?rarity_id=3" class="btn btn-secondary"
+      >Promo</a
+    >
+    <a href="/views/allcards/filter?rarity_id=4" class="btn btn-secondary"
+      >Rare</a
+    >
+    <a href="/views/allcards/filter?rarity_id=5" class="btn btn-secondary"
+      >Rare Holo</a
+    >
+
+    <!-- Filter by STAGE -->
+    <p>Filter by Stage:</p>
+    <a href="/views/allcards/filter?stage_id=2" class="btn btn-secondary"
+      >Basic</a
+    >
+    <a href="/views/allcards/filter?stage_id=8" class="btn btn-secondary"
+      >Stage 1</a
+    >
+    <a href="/views/allcards/filter?stage_id=9" class="btn btn-secondary"
+      >Stage 2</a
+    >
+  </div>
+
+  <!-- Grey separation line -->
+  <hr class="my-4" />
+
   <div class="container">
     <div class="row">
       <!-- Loop through all of the cards -->

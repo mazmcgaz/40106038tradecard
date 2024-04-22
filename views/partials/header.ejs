@@ -11,19 +11,30 @@
       crossorigin="anonymous"
     />
 
-    <link rel="stylesheet" href="../../public/styles/style.css" />
-    <style>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Jersey+20&display=swap"
+      rel="stylesheet"
+    />
+
+    <!-- old and incorrect css link <link rel="stylesheet" href="../../public/styles/style.css" /> -->
+    <link rel="stylesheet" href="../../styles/style.css" />
+    <!-- deletedcss - dont think i need anymore - <style>
       .feature-icon {
         width: 4rem;
         height: 4rem;
         border-radius: 0.75rem;
       }
-    </style>
+    </style> -->
   </head>
 
   <body>
     <header>
-      <nav class="navbar fixed-top navbar-expand-lg bg-body-tertiary">
+      <nav
+        class="navbar fixed-top navbar-expand-lg bg-body-tertiary"
+        id="topbar"
+      >
         <div class="container-fluid">
           <a class="navbar-brand" href="/">
             <!-- Wrap the text and image inside <a> tags -->
@@ -60,7 +71,7 @@
               </li>
 
               <li class="nav-item">
-                <a class="nav-link" href="/views/allcards">Cards</a>
+                <a class="nav-link" href="/views/allcards/filter">Cards</a>
               </li>
 
               <li class="nav-item">

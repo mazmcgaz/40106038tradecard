@@ -1,28 +1,11 @@
 <%- include("partials/header.ejs") %>
 
 <style>
-  .action-item {
-    background-color: #f6ea9a; /* Grey background */
-    border: 1px solid #ced4da; /* Border outline */
-    padding: 10px;
-    margin-bottom: 20px;
-    color: black;
-    height: 300px; /* Fixed height for each action item */
-    display: flex;
-    flex-direction: column;
-    justify-content: center;
-    align-items: center;
-  }
+  
 
-  .action-item:hover {
-    background-color: #e3c416; /* Light grey on hover */
-    transform: scale(1.1); /* Enlarge the card on hover */
-  }
+ 
 
-  .action-item img {
-    max-width: 50%; /* Set maximum width for images */
-    height: auto; /* Maintain aspect ratio */
-  }
+  
 
   /* Modal styles */
   .modal-dialog {
@@ -69,8 +52,8 @@
       <!-- Loop through all of the members -->
       <% rowdata.forEach(user => { %>
       <div class="col-md-4">
-        <!-- Bootstrap column for each action item -->
-        <div class="action-item">
+        
+        <div class="action-item" id ="my-members">
           <!-- User image -->
           <img src="<%= user.user_image %>" alt="<%= user.user_display_name %>" />
 

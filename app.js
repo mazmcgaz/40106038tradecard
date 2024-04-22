@@ -94,18 +94,60 @@ app.post('/', (req, res) => {
 
 
 
-
-// show the all the cards in the database
-app.get('/views/allcards', (req, res) => {
+// **display all cards AND route for filtering by price, name
+app.get('/views/allcards/filter', (req, res) => {
     // Check if the user is logged in
     const userLoggedIn = req.session.authen ? true : false;
+    console.log('userLoggedIn:', userLoggedIn);
 
-    // Fetch all the cards from the database
-    const cardsQuery = `SELECT card_id, card_name, image_url, price_market, price_low FROM card`;
+    // Get the ID of the logged-in user
+    const userId = req.session.authen;
+    console.log('loggedInUserId:', userId);
+
+    // Get the sort parameter from the query string, default to sorting by card name if not specified
+    const filter = req.query.sort || 'card_name';
+    // Get the sort order parameter from the query string, default to ascending order if not specified
+    const sortOrder = req.query.order === 'desc' ? 'DESC' : 'ASC';
+
+    // expansion_id parameter from the query string
+    const expansionId = req.query.expansion_id;
+
+    // rarity_id parameter from the query string
+    const rarityId = req.query.rarity_id;
+
+    // stage_id parameter from the query string
+    const stageId = req.query.stage_id;
+
+    // filter by expansion_id
+    let expansionFilter = '';
+    if (expansionId) {
+        expansionFilter = `WHERE expansion_id = ${expansionId}`;
+    }
+
+    // filter by rarity_id
+    let rarityFilter = '';
+    if (rarityId) {
+        rarityFilter = `WHERE rarity_id = ${rarityId}`;
+    }
+
+     // filter by stage_id
+     let stageFilter = '';
+     if (stageId) {
+        stageFilter = `WHERE stage_id = ${stageId}`;
+     }
+
+    // Fetch all the cards from the database with optional filtering by expansion_id
+    const cardsQuery = `SELECT card_id, card_name, image_url, price_market, price_low, expansion_id, rarity_id, stage_id
+                        FROM card
+                        ${expansionFilter}
+                        ${rarityFilter}
+                        ${stageFilter}
+                        ORDER BY ${filter} ${sortOrder};`;
+
     connection.query(cardsQuery, (err, rows) => {
         if (err) {
-            console.error("Error fetching cards:", err);
-            res.status(500).send("Internal Server Error");
+            console.error("Error sorting/filtering cards:", err);
+            res.status(500).send("Error sorting/filtering the cards");
             return;
         }
 
@@ -410,6 +452,8 @@ app.get('/views/comments/:collectionId', (req, res) => {
 });
 
 
+
+
 // view all the cards in each individual collection belonging to a user
 
 // view all the cards in each individual collection belonging to a user
@@ -449,6 +493,58 @@ app.get('/views/collectiondetails/:id', (req, res) => {
         collectionId: collectionId, });
     });
 });
+
+
+
+// FILTER MENU
+// We want to be able to allow a user to arrange the data by price, alphabetical order and even type. 
+// To achieve this type of functionality we can use a query parameter within the URL to send a sort keyword to influence the SQL query.
+app.get('/views/collectiondetails/:id/filter', (req, res) => {
+   
+    // Check if the user is logged in
+    const userLoggedIn = req.session.authen ? true : false;
+    console.log('userLoggedIn:', userLoggedIn);
+ 
+    // Get the ID of the logged-in user
+   //  const loggedInUserId = req.session.userId;
+    const userId = req.session.authen;
+    console.log('loggedInUserId:', userId);
+ 
+    const collectionId = req.params.id;
+   
+    // lab 07 code begins here
+    const filter = req.query.sort;
+   
+    const cardsSQL=`
+    SELECT collection_card.collection_card_id, card.card_id, card.card_name, card.image_url,  collection.user_id  
+    FROM collection_card
+    JOIN card ON collection_card.card_id = card.card_id
+    JOIN collection ON collection_card.collection_id = collection.collection_id
+    WHERE collection_card.collection_id =  1
+    ORDER BY ${filter}; `;
+    
+
+     // Execute the query
+     connection.query(cardsSQL, [collectionId], (err, rows) => {
+        if (err) {
+            console.error('Error sorting cards', err);
+            res.status(500).send('Error sorting the cards');
+            return;
+        }
+         // user ID associated with the collection is retrieved 
+         const collectionOwnerId = rows.length > 0 ? rows[0].user_id : null;
+
+        // Render the comments page with the fetched comments
+        res.render('collectiondetails', { cards: rows, userLoggedIn: userLoggedIn, collectionOwnerId: collectionOwnerId, loggedInUserId: userId,
+            collectionId: collectionId, });
+    });
+});
+
+
+
+
+
+
 
 
 // Route for showing the comment form for a specific collection

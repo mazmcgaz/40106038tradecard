@@ -1,7 +1,7 @@
 <%- include("partials/header.ejs") %>
 
-<div class="container mt-5">
-  <div class="row justify-content-center">
+<main>
+  <div class="container mt-5">
     <div class="col-md-6">
       <div id="inputContainer">
         <form
@@ -9,6 +9,8 @@
           action="/createcollection"
           method="POST"
         >
+          <br />
+          <br />
           <br />
           <br />
           <h2 class="mb-4">Create a New Collection</h2>
@@ -23,17 +25,6 @@
               class="form-control"
               placeholder="Enter collection name"
               maxlength="30"
-              <!--
-              Add
-              maxlength
-              attribute
-              to
-              limit
-              input
-              to
-              30
-              characters
-              --
             />
 
             <small class="form-text text-muted">
@@ -52,17 +43,6 @@
               rows="4"
               placeholder="Enter collection description (max 300 characters)"
               maxlength="300"
-              <!--
-              Add
-              maxlength
-              attribute
-              to
-              limit
-              input
-              to
-              300
-              characters
-              --
             ></textarea>
             <small class="form-text text-muted">
               <!-- Display character count -->
@@ -82,25 +62,40 @@
       </div>
     </div>
   </div>
-</div>
-
+</main>
 <%- include("partials/footer.ejs") %>
 
 <script>
-  // Get the input element
+  // 1) doing collectionName
+  const collectionNameInput = document.getElementById("collectionName");
+
+  // character count:
+  const collectionNameCountSpan = document.getElementById(
+    "collectionNameCount"
+  );
+
+  // 2) donig collectionDescription
   const collectionDescriptionInput = document.getElementById(
     "collectionDescription"
   );
-  // Get the span element where character count will be displayed
+  // character count:
   const collectionDescriptionCountSpan = document.getElementById(
     "collectionDescriptionCount"
   );
 
-  // Add event listener for input event
+  // 1) Add event listener
+  collectionNameInput.addEventListener("input", function () {
+    // Get the current length of the input value
+    const currentLength1 = collectionNameInput.value.length;
+    // Update the character count display
+    collectionNameCountSpan.textContent = currentLength1;
+  });
+
+  // 2) Add event listener
   collectionDescriptionInput.addEventListener("input", function () {
     // Get the current length of the input value
-    const currentLength = collectionDescriptionInput.value.length;
+    const currentLength2 = collectionDescriptionInput.value.length;
     // Update the character count display
-    collectionDescriptionCountSpan.textContent = currentLength;
+    collectionDescriptionCountSpan.textContent = currentLength2;
   });
 </script>

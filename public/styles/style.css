@@ -1,5 +1,47 @@
-.btn {
-  white-space: nowrap;
+.body {
+  background-color: rgb(251, 234, 211);
+}
+
+header {
+  font-family: "Jersey 20", sans-serif;
+  font-size: 30px;
+}
+
+main {
+  font-family: "Jersey 20", sans-serif;
+}
+
+.bg-body-tertiary {
+  background-color: rgb(181, 193, 142) !important;
+  height: 90px;
+}
+
+.h1 {
+  font-family: "Jersey 20", sans-serif;
+  font-size: 30px;
+}
+
+a.nav-link {
+  font-size: 30px;
+}
+
+.jersey-20-regular {
+  font-family: "Jersey 20", sans-serif;
+  font-weight: 400;
+  font-style: normal;
+}
+
+.btn-primary {
+  color: #250202;
+  background-color: #b99470;
+  border-color: #af8254;
+  font-size: 20px;
+}
+
+.btn-success {
+  color: #002d01;
+  background-color: #70b977;
+  font-size: 20px;
 }
 
 .flower-head {
@@ -11,15 +53,16 @@
   position: sticky;
   top: 10px;
   z-index: 970;
+  background-color: #3586ff;
 }
 
-.nav {
-  height: 30px;
-}
+/* I don't think I'm using - oldcss
+/* .nav {
+  height: 80px;
+} */
 
-.nav-item {
-  background-color: #ff8080;
-  color: black;
+container-fluid {
+  background-color: #3586ff;
 }
 
 .nav-link {
@@ -35,16 +78,13 @@
 }
 
 .row {
-  border: thick solid black;
-  background-color: rgb(255, 168, 221);
-  color: rgb(0, 255, 255);
+  color: rgb(1, 5, 5);
   justify-content: center;
 }
 
 .container {
   margin-top: 100px;
-  padding: 100px;
-  background-color: blue;
+
   display: flex;
   justify-content: space-around;
   align-items: center;
@@ -61,10 +101,8 @@
 }
 
 .card {
-  width: calc(
-    33.33% - 20px
-  ); /* Adjust width to fit three cards in a row with margins */
-  margin: 10px; /* Margin between cards */
+  margin: 10px;
+  background-color: #3586ff; /* Margin between cards */
 }
 
 /*
@@ -83,7 +121,7 @@
   flex: 0 0 auto;
   position: relative;
   width: 100%;
-  background: #3586ff;
+  background: #ff35bc;
   min-height: 100px;
   padding: 20px 50px;
   display: flex;
@@ -99,9 +137,13 @@
   align-items: center;
 }
 
-.social-icons,
+.social-icons {
+  display: flex;
+  font-size: 30px;
+}
 .menu-items {
   display: flex;
+  font-size: 20px;
 }
 
 .menu-items a {
@@ -133,7 +175,7 @@ footer .social_icon li a {
 
 footer .social_icon li a:hover {
   transform: translateY(-15px);
-  color: blue;
+  color: rgb(255, 0, 157);
 }
 
 footer .menu li a {
@@ -187,6 +229,27 @@ footer .menu li a:hover {
   margin-top: 10px;
 }
 
+/* used to display the members */
+#my-members {
+  background-color: #f7dcb9;
+  padding: 20px; /* was og 10 */
+  margin-bottom: 20px;
+  color: black;
+  height: 300px; /* Fixed height for each action item */
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  text-align: center; /* added in */
+  border-radius: 8px; /* added in */
+  min-height: 300px; /* Set minimum height for action-items */
+}
+
+#my-members img {
+  max-width: 50%; /* Set maximum width for images */
+  height: auto; /* Maintain aspect ratio */
+}
+
 .action-item-dashboard {
   width: 200px;
   height: 100px;
@@ -200,7 +263,8 @@ footer .menu li a:hover {
 }
 
 .action-item:hover {
-  background-color: #b6002e;
+  background-color: #ecb51c;
+  transform: scale(1.1); /* make bigger when hovering */
 }
 
 .action-item p {
@@ -217,6 +281,10 @@ footer .menu li a:hover {
 .action-item img {
   max-width: 100%; /* Set maximum width for images */
   height: auto; /* Maintain aspect ratio */
+}
+
+.form-label {
+  font-size: 30px;
 }
 
 @media (max-width: 768px) {
