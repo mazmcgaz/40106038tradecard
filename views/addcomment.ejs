@@ -1,31 +1,179 @@
 <%- include("partials/header.ejs") %>
 
 <main class="container">
-  <h1 class="mt-5">Add Comment</h1>
-
-  <% if (userLoggedIn) { %>
-  <form
-    action="/views/addcomment/<%= collectionId %>"
-    method="post"
-    class="mt-4"
-  >
-    <div class="mb-3">
-      <label for="commentContent" class="form-label"
-        >Enter your comment here:</label
-      >
-      <textarea
-        name="comment_content"
-        id="commentContent"
-        class="form-control"
-        rows="4"
-        placeholder="Enter your comment here"
-      ></textarea>
+  <div class="col-md-8">
+    <div class="mt-5">
+      <h1 class="display-4">Add Comment</h1>
+      <h4>
+        Ensure comments are polite, constructive, and respectful, avoiding
+        offensive language and staying relevant to the topic while respecting
+        diversity and privacy. Fact-check information, use proper grammar, and
+        report inappropriate content to foster a positive and respectful
+        environment for discussion.
+      </h4>
     </div>
-    <button type="submit" class="btn btn-primary">Submit</button>
-  </form>
-  <% } else { %>
-  <p class="mt-4">Please log in to leave a comment.</p>
-  <% } %>
+
+    <!-- Button trigger modal -->
+    <button type="button" class="btn btn-warning" id="modalTriggerButton">
+      More Information
+    </button>
+
+    <!-- Modal -->
+    <div
+      class="modal fade"
+      id="exampleModalLong"
+      tabindex="-1"
+      role="dialog"
+      aria-labelledby="exampleModalLongTitle"
+      aria-hidden="true"
+    >
+      <div class="modal-dialog" role="document">
+        <div class="modal-content">
+          <div class="modal-header">
+            <h5 class="modal-title" id="exampleModalLongTitle">
+              User Guidelines
+            </h5>
+            <button
+              type="button"
+              class="close"
+              data-dismiss="modal"
+              aria-label="Close"
+            >
+              <span aria-hidden="true">&times;</span>
+            </button>
+          </div>
+          <div class="modal-body">
+            <ol>
+              <li>
+                Be Polite and Courteous: Always maintain a polite and respectful
+                tone in your comments. Avoid using offensive language, insults,
+                or derogatory remarks.
+              </li>
+              <li>
+                Stay Constructive: Provide constructive feedback or comments
+                that add value to the discussion or content. Avoid simply
+                criticizing without offering suggestions for improvement.
+              </li>
+              <li>
+                Respect Diversity: Respect the diversity of opinions,
+                backgrounds, and experiences. Avoid making discriminatory or
+                prejudiced remarks based on factors such as race, gender,
+                religion, nationality, or sexual orientation.
+              </li>
+              <li>
+                Keep it Relevant: Keep your comments relevant to the topic or
+                content being discussed. Avoid going off-topic or derailing the
+                conversation.
+              </li>
+              <li>
+                Fact-Check Before Commenting: Ensure the accuracy of your
+                comments by fact-checking information before posting. Avoid
+                spreading misinformation or rumors.
+              </li>
+              <li>
+                Avoid Spam: Refrain from spamming the comments section with
+                repetitive or irrelevant comments, promotional content, or
+                links.
+              </li>
+              <li>
+                Use Proper Grammar and Spelling: Take the time to write your
+                comments clearly and coherently, using proper grammar and
+                spelling. This enhances readability and comprehension.
+              </li>
+              <li>
+                Respect Privacy: Avoid sharing personal or sensitive information
+                in your comments, both about yourself and others. Respect the
+                privacy of individuals mentioned in the content.
+              </li>
+              <li>
+                Be Open-Minded: Be open to different perspectives and willing to
+                engage in constructive dialogue with others, even if you
+                disagree with their viewpoints.
+              </li>
+              <li>
+                Report Inappropriate Content: If you encounter comments that
+                violate the site's guidelines or are disrespectful, report them
+                to the site administrators for appropriate action.
+              </li>
+            </ol>
+          </div>
+          <div class="modal-footer">
+            <button
+              type="button"
+              class="btn btn-secondary"
+              data-dismiss="modal"
+            >
+              Close
+            </button>
+            <button type="button" class="btn btn-primary">I understand</button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <% if (userLoggedIn) { %>
+    <form
+      action="/views/addcomment/<%= collectionId %>"
+      method="post"
+      class="mt-4"
+      id="commentForm"
+    >
+      <!-- the id commentForm is used to force the user to enter at least 1 characters in the box  -->
+
+      <div class="mb-3">
+        <label for="commentContent" class="form-label"
+          >Enter your comment here:</label
+        >
+        <textarea
+          name="comment_content"
+          id="commentContent"
+          class="form-control"
+          rows="4"
+          placeholder="I really like these cards!"
+        ></textarea>
+      </div>
+      <button type="submit" class="btn btn-primary" id="submitBtn">
+        Submit
+      </button>
+    </form>
+    <% } else { %>
+    <p class="mt-4">Please log in to leave a comment.</p>
+    <% } %>
+
+    <!-- Go back button -->
+    <div class="mt-5 mb-4">
+      <a
+        href="/views/collectiondetails/<%= collectionId %>"
+        class="btn btn-primary"
+        >Back</a
+      >
+    </div>
+  </div>
 </main>
 
 <%- include("partials/footer.ejs") %>
+
+<script>
+  var modalTriggerButton = document.getElementById("modalTriggerButton");
+  var myModal = new bootstrap.Modal(
+    document.getElementById("exampleModalLong")
+  );
+
+  modalTriggerButton.addEventListener("click", function () {
+    myModal.show();
+  });
+
+  // Add event listener to the submit button
+  document
+    .getElementById("submitBtn")
+    .addEventListener("click", function (event) {
+      var commentContent = document
+        .getElementById("commentContent")
+        .value.trim(); // Get the value of the comment content and trim whitespace
+      if (commentContent.length === 0) {
+        // Check if the length is 0
+        event.preventDefault(); // Prevent form submission
+        alert("Please enter at least 1 character in the comment box."); // Show an alert
+      }
+    });
+</script>

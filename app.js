@@ -421,6 +421,14 @@ app.get('/views/back', (req, res) => {
 app.get('/views/comments/:collectionId', (req, res) => {
     // Check if the user is logged in
     const userLoggedIn = req.session.authen ? true : false;
+    console.log('userLoggedIn:', userLoggedIn);
+
+    // Get the ID of the logged-in user
+  //  const loggedInUserId = req.session.userId;
+  const userId = req.session.authen;
+  console.log('loggedInUserId:', userId);
+
+
 
     // Redirect to login page if user is not logged in
     if (!userLoggedIn) {
@@ -432,7 +440,7 @@ app.get('/views/comments/:collectionId', (req, res) => {
 
     // Query to fetch comments for the specified collection
     const commentsQuery = `
-        SELECT Comment.*, User.user_display_name
+        SELECT Comment.*, User.user_display_name, User.user_image, User.user_id
         FROM Comment
         JOIN User ON Comment.user_id = User.user_id
         WHERE Comment.collection_id = ?
@@ -447,14 +455,51 @@ app.get('/views/comments/:collectionId', (req, res) => {
         }
 
         // Render the comments page with the fetched comments
-        res.render('comments', { comments: comments, userLoggedIn: userLoggedIn });
+        res.render('comments', { comments: comments, userLoggedIn: userLoggedIn, collectionId: collectionId, loggedInUserId: userId  });
+    });
+});
+
+
+
+// COPYING THIS
+// Route to handle deleting a comment
+app.delete('/views/deletecomment/:commentId', (req, res) => {
+   
+    // Check if the user is logged in
+    if (!req.session.authen) {
+        res.status(401).send('Unauthorised ??');
+        return;
+    }
+
+    // Extract the comment ID from the request parameters
+    const commentId = req.params.commentId;
+
+    // Query to delete the comment from the database
+    const deleteCommentQuery = 'DELETE FROM comment WHERE comment_id = ?';
+
+    // Execute the query
+    connection.query(deleteCommentQuery, [commentId], (err, result) => {
+        if (err) {
+            console.error('Error deleting comment:', err);
+            res.status(500).send('Error deleting comment');
+            return;
+        }
+
+        // Check if any rows were affected
+        if (result.affectedRows === 0) {
+            res.status(404).send('Comment not found');
+            return;
+        }
+
+        // Send a success response
+        res.status(200).send('Comment deleted successfully');
     });
 });
 
 
 
 
-// view all the cards in each individual collection belonging to a user
+
 
 // view all the cards in each individual collection belonging to a user
 app.get('/views/collectiondetails/:id', (req, res) => {
@@ -620,7 +665,7 @@ app.post('/views/deletecollection/:id', (req, res) => {
         }
 
         // Redirect the user back to the user collection page
-        res.redirect('/dashboard'); 
+        res.redirect('/views/usercollection'); 
     });
 });
 
@@ -739,9 +784,13 @@ app.get('/views/howtoplay', (req, res) => {
 });
 
 
+// probably can delete this 
+// app.get('/views/login',  (req, res) => {
+//     res.render('login');
+// });
 
-app.get('/views/login',  (req, res) => {
-    res.render('login');
+app.get('/views/login', (req, res) => {
+    res.render('login', { loginError: false }); // Pass loginError as false initially
 });
 
 app.get('/views/register',  (req, res) => {
@@ -803,7 +852,7 @@ app.post('/newmember', (req, res) => {
                         return;
                     }
 
-                    res.render('dashboard');
+                    res.render('login');
                 });
             });
         }
@@ -818,6 +867,7 @@ app.get('/views/login', (req, res) => {
 
 
 // 3. the user logs into their account
+
 app.post("/views/login", async (req, res) => {
     const loginEmail = req.body.loginEmail;
     const loginPassword = req.body.loginPassword;
@@ -825,7 +875,7 @@ app.post("/views/login", async (req, res) => {
     console.log("Received login credentials:", loginEmail);
 
     try {
-        const result = await queryAsync("SELECT user_id, user_email, user_first_name, user_last_name, user_role, user_password FROM User WHERE user_email = ?", [loginEmail]);
+        const result = await queryAsync("SELECT user_id, user_email, user_first_name, user_last_name, user_role, user_password, user_image FROM User WHERE user_email = ?", [loginEmail]);
 
         if (result.length > 0) {
             const user = result[0];
@@ -845,18 +895,20 @@ app.post("/views/login", async (req, res) => {
                     req.session.authen = user.user_id; // Set user ID in session upon successful login
                     res.redirect('/views/dashboard');
                 } else {
-                    res.status(401).send("<script>alert('Incorrect password'); window.location='/views/login';</script>");
+                    // Set loginError to true to indicate a failed login attempt
+                    res.render('login', { loginError: true });
                 }
             });
         } else {
-            res.status(404).send("User not found");
+            // Set loginError to true to indicate a failed login attempt
+            res.render('login', { loginError: true });
         }
     } catch (err) {
         console.error("Error logging in:", err);
         res.status(500).send("Internal Server Error");
     }
-   
 });
+
 
 
 // Logout route
@@ -1033,14 +1085,57 @@ app.post('/updateUser', (req, res) => {
             return;
         }
         
-        res.redirect('/views/account'); // Redirect back to the account page after updating
+        res.redirect('/views/dashboard'); // Redirect back to the account page after updating
     });
 });
 
 
 
+// Handle the PUT request to update user's first name
+app.post('/updateFirstName', (req, res) => {
+    console.log('POST /updateFirstName route hit');
+    console.log('Request body:', req.body);
+
+    const newFirstName = req.body.newFirstName;
+    const userId = req.session.authen;
+
+    const updateQuery = 'UPDATE User SET user_first_name = ? WHERE user_id = ?';
+    connection.query(updateQuery, [newFirstName, userId], (err, result) => {
+        if (err) {
+            console.error('Error updating user first name:', err);
+            res.status(500).send('Error updating user first name');
+            return;
+        }
+        
+        res.redirect('/views/dashboard');
+    });
+});
+
+// Handle the PUT request to update user's last name
+app.post('/updateLastName', (req, res) => {
+    console.log('POST /updateLastName route hit');
+    console.log('Request body:', req.body);
+
+    const newLastName = req.body.newLastName;
+    const userId = req.session.authen;
+
+    const updateQuery = 'UPDATE User SET user_last_name = ? WHERE user_id = ?';
+    connection.query(updateQuery, [newLastName, userId], (err, result) => {
+        if (err) {
+            console.error('Error updating user last name:', err);
+            res.status(500).send('Error updating user last name');
+            return;
+        }
+        
+        res.redirect('/views/dashboard');
+    });
+});
+
+
+
+
+
 // 10. delete a single card from a user's collection
-// Define the DELETE route
 app.delete('/views/deletefromcollection/:collectionCardId', (req, res) => {
     // Extract the collection card ID from the request parameters
     const collectionCardId = req.params.collectionCardId;
@@ -1075,6 +1170,6 @@ app.get('*', (req, res) => {
 
   
 
-app.listen(process.env.PORT || 3001, ()=>{ 
-    console.log("server started on: localhost:3001");
+app.listen(process.env.PORT || 3003, ()=>{ 
+    console.log("server started on: localhost:3003");
 });

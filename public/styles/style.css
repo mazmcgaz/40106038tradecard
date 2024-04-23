@@ -2,6 +2,10 @@
   background-color: rgb(251, 234, 211);
 }
 
+* {
+  font-family: "Jersey 20", sans-serif;
+}
+
 header {
   font-family: "Jersey 20", sans-serif;
   font-size: 30px;
@@ -44,9 +48,27 @@ a.nav-link {
   font-size: 20px;
 }
 
+.btn-danger {
+  background-color: rgb(232, 109, 109);
+}
+
+.user-image {
+  max-width: 150px; /* Set maximum width */
+  max-height: 150px; /* Set maximum height */
+}
+
 .flower-head {
   height: 60px;
   width: 60px;
+}
+
+.user-name {
+  font-size: 25px; /* Adjust the font size as needed */
+  font-weight: bold;
+}
+
+.comment-text {
+  font-size: 20px; /* Adjust the font size as needed */
 }
 
 .navbar-sticky {
@@ -83,12 +105,16 @@ container-fluid {
 }
 
 .container {
+  font-family: "Jersey 20", sans-serif;
   margin-top: 100px;
-
   display: flex;
   justify-content: space-around;
   align-items: center;
   flex-wrap: wrap; /* Allow items to wrap to the next line if needed */
+}
+
+#ratingcontainer {
+  margin-top: 10px;
 }
 
 .col-xl-2 {
@@ -102,7 +128,7 @@ container-fluid {
 
 .card {
   margin: 10px;
-  background-color: #3586ff; /* Margin between cards */
+  background-color: #ade4db; /* Margin between cards */
 }
 
 /*
@@ -285,6 +311,60 @@ footer .menu li a:hover {
 
 .form-label {
   font-size: 30px;
+}
+
+/* star rating on members' collections */
+.rating-wrap {
+  max-width: 480px;
+  margin: auto;
+  padding: 15px;
+  box-shadow: 0 0 3px 0 rgba(0, 0, 0, 0.2);
+  text-align: center;
+}
+
+#rating-value {
+  width: 110px;
+  margin: 40px auto 0;
+  padding: 10px 5px;
+  text-align: center;
+  box-shadow: inset 0 0 2px 1px rgba(46, 204, 113, 0.2);
+}
+
+.rating {
+  border: none;
+  float: left;
+}
+
+.rating > input {
+  display: none;
+}
+
+.rating > label:before {
+  content: "\f005";
+  font-family: FontAwesome;
+  margin: 5px;
+  font-size: 1.5 rem;
+  display: inline-block;
+  cursor: pointer;
+}
+
+.rating > label {
+  color: #ddd;
+  cursor: pointer;
+  float: right;
+}
+
+.rating > input:checked ~ label,
+.rating:not(:checked) > label::hover,
+.rating:not(:checked) > label:hover ~ label {
+  color: #2ce679;
+}
+
+.rating > input:checked + label:hover,
+.rating > input:checked ~ label:hover,
+.rating > input:hover ~ input:checked ~ label,
+.rating > input:checked ~ label:hover ~ label {
+  color: rgba(221, 34, 199, 0.867);
 }
 
 @media (max-width: 768px) {

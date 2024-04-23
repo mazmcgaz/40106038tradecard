@@ -35,6 +35,14 @@
           <button type="submit" name="loginButton" class="btn btn-primary">
             LOG IN
           </button>
+
+          <!-- Conditional rendering for login error message -->
+          <% if (loginError) { %>
+            <div class="alert alert-danger mt-3" role="alert">
+              Login failed; Invalid user ID or password
+            </div>
+            <% } %>
+            <!-- End of conditional rendering -->
         </form>
       </div>
     </div>

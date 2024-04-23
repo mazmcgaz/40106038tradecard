@@ -2,48 +2,114 @@
 
 <main>
   <br />
-  <div class="container mt-5">
-    <div class="row justify-content-center">
-      <div class="col-md-6">
-        <div class="card">
-          <div class="card-body">
-            <h5 class="card-title text-center mb-4">Update Display Name</h5>
-            <!-- <form id="updateDisplayNameForm" method="POST"> -->
-            <form id="updateDisplayNameForm" action="/updateUser" method="POST">
-              <input type="hidden" name="_method" value="PUT" />
+  <br />
+  <br />
+  <br />
 
-              <!-- Hidden input to specify PUT request -->
-              <div class="mb-3">
-                <label for="newDisplayName" class="form-label"
-                  >New Display Name:</label
-                >
-                <input
-                  type="text"
-                  class="form-control"
-                  id="newDisplayName"
-                  name="newDisplayName"
-                  required
-                />
-              </div>
-              <div class="text-center">
-                <button type="submit" class="btn btn-primary">
-                  Update Display Name
-                </button>
-              </div>
-            </form>
-            <br />
-            <div class="container">
-              <div class="row">
-                <div class="col-md-12 text-center">
-                  <a
-                    href="/views/dashboard"
-                    class="btn btn-secondary back-to-cards-button"
-                    >Back to Dashboard</a
-                  >
-                </div>
-              </div>
+  <div class="container mt-5">
+    <div class="col-md-6 text-center">
+      <h1>Update Account Details</h1>
+      <br />
+      <!-- the dashboard button-->
+
+      <div class="col-md-12 text-center">
+        <a
+          href="/views/dashboard"
+          class="btn btn-secondary back-to-cards-button"
+          >Back to Dashboard</a
+        >
+      </div>
+
+      <!-- Update DISPLAY Name Form -->
+      <div class="card">
+        <div class="card-body">
+          <br />
+
+          <h5 class="card-title text-center mb-4"></h5>
+          <!-- <form id="updateDisplayNameForm" method="POST"> -->
+          <form id="updateDisplayNameForm" action="/updateUser" method="POST">
+            <input type="hidden" name="_method" value="PUT" />
+
+            <!-- Hidden input to specify PUT request -->
+            <div class="mb-3">
+              <label for="newDisplayName" class="form-label"
+                >New Display Name:</label
+              >
+              <input
+                type="text"
+                class="form-control"
+                id="newDisplayName"
+                name="newDisplayName"
+                required
+              />
             </div>
-          </div>
+            <div class="text-center">
+              <button type="submit" class="btn btn-primary">
+                Update Display Name
+              </button>
+            </div>
+          </form>
+          <br />
+        </div>
+      </div>
+
+      <!-- Update FIRST Name Form -->
+      <div class="card">
+        <div class="card-body">
+          <br />
+          <h5 class="card-title text-center mb-4"></h5>
+          <form
+            id="updateFirstNameForm"
+            action="/updateFirstName"
+            method="POST"
+          >
+            <input type="hidden" name="_method" value="PUT" />
+            <div class="mb-3">
+              <label for="newFirstName" class="form-label"
+                >New First Name:</label
+              >
+              <input
+                type="text"
+                class="form-control"
+                id="newFirstName"
+                name="newFirstName"
+                required
+              />
+            </div>
+            <div class="text-center">
+              <button type="submit" class="btn btn-primary">
+                Update First Name
+              </button>
+            </div>
+          </form>
+          <br />
+        </div>
+      </div>
+
+      <!-- Update FIRST Name Form -->
+      <div class="card">
+        <div class="card-body">
+          <br />
+          <h5 class="card-title text-center mb-4"></h5>
+          <form id="updateLastNameForm" action="/updateLastName" method="POST">
+            <input type="hidden" name="_method" value="PUT" />
+            <div class="mb-3">
+              <label for="newLastName" class="form-label">New Last Name:</label>
+              <input
+                type="text"
+                class="form-control"
+                id="newLastName"
+                name="newLastName"
+                required
+              />
+            </div>
+            <div class="text-center">
+              <button type="submit" class="btn btn-primary">
+                Update Last Name
+              </button>
+            </div>
+          </form>
+          <br />
         </div>
       </div>
     </div>
@@ -62,6 +128,35 @@
       // Submit the form
       this.submit();
     });
+
+
+
+    // JavaScript to display alert after form submission
+  document.getElementById("updateFirstNameForm").addEventListener("submit", function (event) {
+    // Prevent the form from submitting normally
+    event.preventDefault();
+    // Show alert
+    alert("Success");
+    // Submit the form
+    this.submit();
+  });
+
+  document.getElementById("updateLastNameForm").addEventListener("submit", function (event) {
+    // Prevent the form from submitting normally
+    event.preventDefault();
+    // Show alert
+    alert("Success");
+    // Submit the form
+    this.submit();
+  });
+</script>
+
+
+
+
+
+
+
 </script>
 
 <%- include("partials/footer.ejs") %>

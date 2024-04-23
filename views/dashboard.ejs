@@ -17,6 +17,13 @@
 <div class="px-4 pt-5 my-5 text-center border-bottom">
   <h1 class="display-4 fw-bold text-body-emphasis">Dashboard</h1>
   <h2>Welcome back, <%= userData.user_display_name %>!</h2>
+  <div>
+    <img
+      class="user-image"
+      src="<%= userData.user_image %>"
+      alt="<%= userData.user_display_name %>"
+    />
+  </div>
 
   <div class="container">
     <div class="row">

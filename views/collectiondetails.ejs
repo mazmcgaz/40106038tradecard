@@ -34,19 +34,6 @@
   <h1 class="display-4 fw-bold text-body-emphasis">Collection Details</h1>
   <br />
 
-  <% if (userLoggedIn) { %>
-  <div class="container">
-    <div class="row">
-      <div class="col-md-12 text-center">
-        <a href="/views/dashboard" class="btn btn-primary back-to-cards-button"
-          >Back to Dashboard</a
-        >
-      </div>
-    </div>
-  </div>
-
-  <% } %>
-
   <main>
     <% if (userLoggedIn) { %>
     <div class="container">
@@ -55,12 +42,24 @@
           <a
             href="/views/usercollection"
             class="btn btn-primary back-to-cards-button"
-            >Back to Your Collections</a
+            >Go to Your Collections</a
+          >
+          <a
+            href="/views/dashboard"
+            class="btn btn-primary back-to-cards-button"
+            >Go to Dashboard</a
+          >
+        </div>
+        <div class="col-md-12 text-center">
+          <a
+            href="/views/alluserscollections/<%= collectionOwnerId %>"
+            class="btn btn-primary back-to-cards-button"
+            >Back</a
           >
         </div>
       </div>
     </div>
-    <% } %>
+    <% } %> <% if (userLoggedIn) { %> <% } %>
 
     <!-- Link to add comment -->
     <% if (userLoggedIn) { %>
@@ -73,17 +72,6 @@
     <a href="/views/comments/<%= collectionId %>" class="btn btn-info">
       View Comments
     </a>
-
-    <div>
-      <!-- filtering by name -->
-      <p>Order by:</p>
-      <a
-        href="collectiondetails<%= collectionId %>/filter?sort=card.card_name"
-        class="btn btn-secondary"
-      >
-        Name
-      </a>
-    </div>
 
     <!-- Grey separation line -->
     <hr class="my-4" />
@@ -137,7 +125,6 @@
     if (
       confirm("Are you sure you want to delete this card from the collection?")
     ) {
-      // Make an AJAX request to delete the card from the collection
       fetch(`/views/deletefromcollection/${collectionCardId}`, {
         method: "DELETE",
       })

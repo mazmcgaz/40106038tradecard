@@ -46,14 +46,41 @@
               <p><%= collection.collection_description %></p>
 
               <!-- Button group for view and delete buttons -->
-
               <a
                 href="/views/collectiondetails/<%= collection.collection_id %>"
                 class="btn btn-primary"
                 >View Collection</a
               >
 
-              <!-- Output collection.user_id and collection.collection_id for debugging -->
+              <!-- add the ratings here-->
+              <div class="container" id="ratingcontainer">
+                <div class="rating-wrap">
+                  <h2>Rating:</h2>
+                  <div class="center">
+                    <fieldset
+                      class="rating"
+                      data-collection-id="<%= collection.collection_id %>"
+                    >
+                      <% for (let i = 5; i >= 1; i--) { %>
+                      <input
+                        type="radio"
+                        id="star<%= collection.collection_id %><%= i %>"
+                        name="rating<%= collection.collection_id %>"
+                        value="<%= i %>"
+                        onclick="saveRating('<%= collection.collection_id %>', <%= i %>)"
+                      />
+                      <label
+                        for="star<%= collection.collection_id %><%= i %>"
+                        class="full"
+                      ></label>
+                      <% } %>
+                    </fieldset>
+                  </div>
+                  <h4 id="rating-value<%= collection.collection_id %>"></h4>
+                </div>
+              </div>
+
+              <!-- DEBUGGING - display collection.user_id and collection.collection_id for debugging -->
               <%- console.log("User ID:", userId, "Collection ID:",
               collection.collection_id) %>
             </div>
@@ -66,3 +93,36 @@
 </main>
 
 <%- include("partials/footer.ejs") %>
+
+<script>
+  document.addEventListener("DOMContentLoaded", function () {
+    let ratings = document.querySelectorAll(".rating");
+    ratings.forEach((rating) => {
+      let collectionId = rating.dataset.collectionId;
+      let storedRating = localStorage.getItem(`rating${collectionId}`);
+      if (storedRating) {
+        let selectedStar = rating.querySelector(
+          `#star${collectionId}${storedRating}`
+        );
+        if (selectedStar) {
+          selectedStar.checked = true;
+          updateRating(collectionId, storedRating);
+        }
+      }
+    });
+  });
+
+  function saveRating(collectionId, ratingValue) {
+    localStorage.setItem(`rating${collectionId}`, ratingValue);
+    updateRating(collectionId, ratingValue);
+  }
+
+  function updateRating(collectionId, ratingValue) {
+    let ratingValueElement = document.querySelector(
+      `#rating-value${collectionId}`
+    );
+    if (ratingValueElement) {
+      ratingValueElement.innerHTML = ratingValue + " out of 5";
+    }
+  }
+</script>

@@ -1,29 +1,77 @@
 <%- include("partials/header.ejs") %>
 
 <main class="container">
-  <h1 class="mt-5 mb-4">Comments</h1>
+  <div class="col-md-8">
+    <div class="mt-5 mb-4">
+      <h1 class="display-4">Comments</h1>
+    </div>
 
-  <!-- Go back button -->
-  <form action="/views/back" method="GET" class="mb-4">
-    <button type="submit" class="btn btn-primary">Go Back</button>
-  </form>
+    <!-- Go back button -->
+    <a
+      href="/views/collectiondetails/<%= collectionId %>"
+      class="btn btn-primary"
+      >Back</a
+    >
 
-  <% if (comments.length === 0) { %>
-  <!-- No comments alert -->
-  <div class="alert alert-info" role="alert">No comments yet.</div>
-  <% } else { %>
-  <!-- List of comments -->
-  <ul class="list-group">
-    <% comments.forEach((comment) => { %>
-    <li class="list-group-item">
-      <div class="d-flex align-items-center">
-        <strong class="mr-2"><%= comment.user_display_name %>:</strong>
-        <span><%= comment.comment_text %></span>
-      </div>
-    </li>
-    <% }) %>
-  </ul>
-  <% } %>
+    <% if (comments.length === 0) { %>
+    <!-- No comments alert -->
+    <div class="alert alert-info" role="alert">No comments yet.</div>
+    <% } else { %>
+    <!-- List of comments -->
+    <ul class="list-group">
+      <% comments.forEach((comment) => { %>
+      <li class="list-group-item mb-3">
+        <!-- Added mb-3 for margin bottom -->
+        <div class="d-flex justify-content-between">
+          <div>
+            <strong class="user-name"><%= comment.user_display_name %>:</strong>
+            <div class="comment-text"><%= comment.comment_text %></div>
+          </div>
+          <div>
+            <h6 class="text-end">
+              <%= comment.created_at.toLocaleDateString('en-GB', { day:
+              '2-digit', month: '2-digit', year: 'numeric' }) + ' at ' +
+              comment.created_at.toLocaleTimeString() %>:
+            </h6>
+
+            <!-- Add delete button here -->
+            <% if (userLoggedIn && comment.user_id === loggedInUserId) { %>
+            <button
+              type="button"
+              class="btn btn-danger btn-sm"
+              onclick="deleteComment('<%= comment.comment_id %>')"
+            >
+              Delete Comment
+            </button>
+            <% } %>
+          </div>
+        </div>
+      </li>
+      <% }) %>
+    </ul>
+    <% } %>
+  </div>
 </main>
 
 <%- include("partials/footer.ejs") %>
+
+<script>
+  // carry out the comment delete
+  function deleteComment(commentId) {
+    // Make a DELETE request to delete the comment
+    fetch(`/views/deletecomment/${commentId}`, {
+      method: "DELETE",
+    })
+      .then((response) => {
+        if (response.ok) {
+          // Reload the page after successful deletion
+          location.reload();
+        } else {
+          console.error("Failed to delete comment:", response.statusText);
+        }
+      })
+      .catch((error) => {
+        console.error("Error deleting comment:", error);
+      });
+  }
+</script>
