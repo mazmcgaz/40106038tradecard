@@ -4,6 +4,7 @@
 
 * {
   font-family: "Jersey 20", sans-serif;
+  font-size: 1rem;
 }
 
 header {
@@ -29,12 +30,50 @@ a.nav-link {
   font-size: 30px;
 }
 
+/* all for styling the collectiondetils page*/
+.card-details-container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  margin-top: 50px;
+}
+
+.card-image {
+  max-width: 100%;
+  height: auto;
+}
+
+.card-details {
+  margin-right: 50px;
+}
+
+.card-details h2 {
+  margin-bottom: 20px;
+}
+
+.card-details p {
+  margin-bottom: 10px;
+}
+
+.back-to-cards-button {
+  margin-top: 20px;
+}
+
+/* sign up page*/
+
+.termsandconditions {
+  background-color: peachpuff;
+  padding: 20px;
+}
+
+/* general stlying */
 .jersey-20-regular {
   font-family: "Jersey 20", sans-serif;
   font-weight: 400;
   font-style: normal;
 }
 
+/* buttons */
 .btn-primary {
   color: #250202;
   background-color: #b99470;
@@ -142,7 +181,7 @@ container-fluid {
   border-radius: 0.75rem;
 }
 
-/* Remove duplicate footer styles */
+/* footer styles */
 .footer {
   flex: 0 0 auto;
   position: relative;
@@ -173,7 +212,7 @@ container-fluid {
 }
 
 .menu-items a {
-  margin-left: 20px; /* Adjust as needed */
+  margin-left: 20px;
 }
 
 footer .social_icon,
@@ -187,7 +226,7 @@ footer .menu {
 
 footer .social_icon li,
 footer .menu li {
-  display: inline-block; /* Change display property */
+  display: inline-block;
   margin-right: 10px;
 }
 
@@ -231,6 +270,8 @@ footer .menu li a:hover {
 .footer a:hover {
   color: #666;
 }
+
+/* end of footer */
 
 .blockquote {
   width: 200px;
@@ -346,6 +387,7 @@ footer .menu li a:hover {
   font-size: 1.5 rem;
   display: inline-block;
   cursor: pointer;
+  color: #ddd; /* added in */
 }
 
 .rating > label {
@@ -367,10 +409,65 @@ footer .menu li a:hover {
   color: rgba(221, 34, 199, 0.867);
 }
 
+/* Updated selectors to style checked stars */
+.rating > input:checked ~ label:before,
+.rating > input:checked + label:hover:before,
+.rating > input:checked ~ label:hover:before {
+  color: #2ce679; /* Color for rated stars */
+}
+
+/* end of star rating on members' collections */
+
+/* media breakpoints / responsiveness */
+
+::after,
+::before {
+  box-sizing: border-box;
+}
+
+*,
+::after,
+::before {
+  box-sizing: content-box;
+}
+
+@media (min-width: 576px) {
+  html {
+    font-size: 1.2rem;
+  }
+}
+
 @media (max-width: 768px) {
+  .col-md-4 {
+    flex: 0 0 auto;
+    width: auto;
+  }
+
+  html {
+    font-size: 1.4rem;
+  }
   .card {
-    width: calc(
-      50% - 20px
-    ); /* Adjust width for smaller screens to fit two cards in a row */
+    width: calc(50% - 20px);
+  }
+}
+
+@media (max-width: 990px) {
+  .bg-body-tertiary {
+    height: auto !important; /* set height to auto to remove fixed height */
+  }
+  a.nav-link {
+    font-size: smaller;
+  }
+}
+
+@media (max-width: 1116px) {
+  a.nav-link {
+    font-size: smaller;
+  }
+}
+
+@media (min-width: 992px) {
+  html {
+    font-size: 1.6rem;
   }
 }

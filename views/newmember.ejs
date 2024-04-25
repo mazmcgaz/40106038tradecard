@@ -82,6 +82,38 @@
               required
             />
           </div>
+          <div class="form-group">
+            <div class="form-check">
+              <br />
+
+              <h4 class="termsandconditions">
+                This is a safe space for trading cards. Members that do not
+                follow the community guidelines will be permanently banned.
+                <!-- Button trigger modal -->
+                <button
+                  type="button"
+                  id="termsModalButton"
+                  class="btn btn-info"
+                  data-toggle="modal"
+                  data-target="#exampleModalLong"
+                >
+                  Terms and Conditions
+                </button>
+              </h4>
+
+              <br />
+              <input
+                class="form-check-input"
+                type="checkbox"
+                id="gridCheck"
+                required
+              />
+
+              <label class="form-check-label" for="gridCheck">
+                I agree to terms and conditions
+              </label>
+            </div>
+          </div>
           <button type="submit" name="registerButton" class="btn btn-primary">
             SIGN UP
           </button>
@@ -90,6 +122,146 @@
     </div>
   </div>
   <!-- </div> -->
+
+  <!-- Modal -->
+  <div
+    class="modal fade"
+    id="exampleModalLong"
+    tabindex="-1"
+    role="dialog"
+    aria-labelledby="exampleModalLongTitle"
+    aria-hidden="true"
+  >
+    <div class="modal-dialog" role="document">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title" id="exampleModalLongTitle">
+            Terms and Conditions
+          </h5>
+          <button
+            type="button"
+            class="close"
+            data-dismiss="modal"
+            aria-label="Close"
+            id="closeModalButton"
+          >
+            <span aria-hidden="true">&times;</span>
+          </button>
+        </div>
+        <div class="modal-body">
+          <ol>
+            <li>
+              Eligibility: You must be at least 18 years old or have obtained
+              parental/guardian consent to register as a member on our website.
+            </li>
+            <li>
+              Account Information: You are responsible for providing accurate
+              and up-to-date information during the registration process. You
+              must not impersonate any other person or entity or use a username
+              that violates any trademarks, copyrights, or other rights.
+            </li>
+            <li>
+              User Conduct: You agree to use our website in compliance with all
+              applicable laws, regulations, and these terms and conditions. You
+              must not engage in any activity that is unlawful, harmful,
+              threatening, abusive, harassing, defamatory, vulgar, obscene, or
+              invasive of another's privacy.
+            </li>
+            <li>
+              Trading Rules: Members are expected to conduct trades in good
+              faith and with honesty and integrity. Any fraudulent, deceptive,
+              or unfair trading practices are strictly prohibited.
+            </li>
+            <li>
+              Content Submission: You retain ownership of any content you submit
+              to our website, but you grant us a worldwide, non-exclusive,
+              royalty-free license to use, reproduce, modify, adapt, publish,
+              translate, and distribute such content in any form.
+            </li>
+            <li>
+              Intellectual Property: You agree not to infringe upon the
+              intellectual property rights of others, including copyrights,
+              trademarks, patents, or trade secrets.
+            </li>
+            <li>
+              Privacy: We respect your privacy and are committed to protecting
+              your personal information. Please review our Privacy Policy to
+              understand how we collect, use, and disclose your information.
+            </li>
+            <li>
+              Security: You are responsible for maintaining the confidentiality
+              of your account credentials and for all activities that occur
+              under your account. You must notify us immediately of any
+              unauthorized use of your account or any other breach of security.
+            </li>
+            <li>
+              Termination: We reserve the right to terminate or suspend your
+              account and access to our website at any time and for any reason,
+              without prior notice or liability.
+            </li>
+            <li>
+              Changes to Terms: We may update or modify these terms and
+              conditions at any time without prior notice. Continued use of our
+              website after any such changes constitutes your acceptance of the
+              revised terms.
+            </li>
+          </ol>
+        </div>
+        <div class="modal-footer">
+          <button
+            type="button"
+            id="closeModalFooterButton"
+            aria-label="Close"
+            class="btn btn-secondary"
+            data-dismiss="modal"
+          >
+            Close
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
 </main>
 
 <%- include("partials/footer.ejs") %>
+
+<script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.5.4/dist/umd/popper.min.js"></script>
+<script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+
+<script>
+  // open modal when the button is clicked
+  document
+    .getElementById("termsModalButton")
+    .addEventListener("click", function () {
+      var modal = document.getElementById("exampleModalLong");
+      modal.classList.add("show");
+      modal.style.display = "block";
+      document.body.classList.add("modal-open");
+    });
+
+  // Function to close the modal
+  function closeModal() {
+    var modal = document.getElementById("exampleModalLong");
+    modal.classList.remove("show");
+    modal.style.display = "none";
+    document.body.classList.remove("modal-open");
+  }
+
+  // close modal when the close button in the header is clicked
+  document
+    .getElementById("closeModalButton")
+    .addEventListener("click", closeModal);
+
+  // close modal when the close button in the footer is clicked
+  document
+    .getElementById("closeModalFooterButton")
+    .addEventListener("click", closeModal);
+
+  // When the user clicks anywhere outside of the modal, close it
+  window.onclick = function (event) {
+    if (event.target == modal) {
+      modal.style.display = "none";
+    }
+  };
+</script>

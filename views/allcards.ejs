@@ -59,7 +59,9 @@
 
   <div>
     <!-- filtering by name -->
+
     <p>Order by:</p>
+
     <a href="/views/allcards/filter?sort=card_name" class="btn btn-secondary">
       Name
     </a>
@@ -145,11 +147,23 @@
 
           <p>Price: $<%= card.price_market %></p>
 
-          <!-- Button to open modal -->
-          <button type="button" class="btn btn-light">Add to Wishlist</button>
-          <button type="button" class="btn btn-light">Add to Collection</button>
+          <% if (userLoggedIn) { %>
 
-          <!-- Add to Wishlist button -->
+          <form
+            id="addToWishlistForm"
+            action="/views/addtowishlist/<%= card.card_id %>"
+            method="POST"
+          >
+            <button id="addToWishlistButton" type="submit" class="btn btn-info">
+              Add to Wishlist
+            </button>
+
+            <!-- Hidden input field to store cardId -->
+            <input type="hidden" name="cardId" value="<%= card.card_id %>" />
+          </form>
+          <% } %>
+
+          <!-- view details button -->
           <button type="button" class="btn btn-primary">View Details</button>
         </div>
       </div>

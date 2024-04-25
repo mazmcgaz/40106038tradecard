@@ -23,13 +23,14 @@
       src="<%= userData.user_image %>"
       alt="<%= userData.user_display_name %>"
     />
-  </div>
 
-  <div class="container">
+    <div class="row">
+      <h4><%= userData.user_first_name %> <%= userData.user_last_name %></h4>
+      <h4><%= userData.user_email %></h4>
+    </div>
+
     <div class="row">
       <div class="col text-center">
-        <!-- Center align content -->
-
         <hr />
         <!-- Horizontal line for separation -->
 
@@ -40,35 +41,35 @@
             <div class="col-md-3">
               <!-- Bootstrap column for each action item -->
               <div class="action-item">
-                <p>View Collections</p>
+                <h5>View Collections</h5>
                 <a href="usercollection">Go</a>
               </div>
             </div>
             <div class="col-md-3">
               <!-- Bootstrap column for each action item -->
               <div class="action-item">
-                <p>Search Directory</p>
+                <h5>Search Directory</h5>
                 <a href="allcards/filter">Go</a>
               </div>
             </div>
             <div class="col-md-3">
               <!-- Bootstrap column for each action item -->
               <div class="action-item">
-                <p>Create a blog</p>
+                <h5>Create a blog</h5>
                 <a href="#">Go</a>
               </div>
             </div>
             <div class="col-md-3">
               <!-- Bootstrap column for each action item -->
               <div class="action-item">
-                <p>Account Details</p>
+                <h5>Account Details</h5>
                 <a href="/views/account">Go</a>
               </div>
             </div>
             <div class="col-md-3">
               <!-- Bootstrap column for each action item -->
               <div class="action-item">
-                <p>Wishlist</p>
+                <h5>View Wishlist</h5>
                 <a href="/views/wishlist">Go</a>
               </div>
             </div>
@@ -83,10 +84,10 @@
       </div>
     </div>
   </div>
+
+  <main>
+    <!-- Main content goes here -->
+  </main>
+
+  <%- include("partials/footer.ejs") %>
 </div>
-
-<main>
-  <!-- Main content goes here -->
-</main>
-
-<%- include("partials/footer.ejs") %>

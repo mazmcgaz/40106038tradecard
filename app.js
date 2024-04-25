@@ -63,20 +63,77 @@ app.use((req, res, next) => {
 
 
 
+// DISPLAY HOME PAGE - old
+// app.get('/',  (req, res) => {
+//    // Set the userLoggedIn variable based on whether the user is logged in or not
+//    const userLoggedIn = req.session.authen ? true : false;
+//    res.render('index', { userLoggedIn: userLoggedIn });
+// });
+
+
+// 1. Function to capitalise the first letter of a string 
+// 2. Used for a user signing up, and user updating their first and last name
+function capitalizeFirstLetter(string) {
+    // Convert the first character to uppercase and concatenate it with the lowercase version of the rest of the string
+    return string.charAt(0).toUpperCase() + string.slice(1).toLowerCase();
+}
+
+
+
 // DISPLAY HOME PAGE
-app.get('/',  (req, res) => {
-   // Set the userLoggedIn variable based on whether the user is logged in or not
-   const userLoggedIn = req.session.authen ? true : false;
-   res.render('index', { userLoggedIn: userLoggedIn });
+app.get('/', (req, res) => {
+    
+    
+    // Check if the user is logged in
+    const userLoggedIn = req.session.authen ? true : false;
+    console.log('userLoggedIn:', userLoggedIn);
+
+    // Get the ID of the logged-in user
+    const userId = req.session.authen;
+    console.log('loggedInUserId:', userId);
+
+    // Fetch the user_display_name from the database
+    const query = "SELECT user_display_name FROM User WHERE user_id = ?";
+    
+    connection.query(query, [userId], (err, result) => {
+        if (err) {
+            console.error("Error fetching user_display_name:", err);
+            // Handle error
+            res.status(500).send("Internal Server Error");
+            return;
+        }
+
+        if (result.length === 0) {
+            console.error("User not found with user ID:", userId);
+            // Handle user not found
+            const userDisplayName = 'Guest';
+            res.render('index', { userLoggedIn: userLoggedIn, userDisplayName: userDisplayName });
+            return;
+        }
+
+        const userDisplayName = result[0].user_display_name;
+        res.render('index', { userLoggedIn: userLoggedIn, userDisplayName: userDisplayName });
+    });
 });
+
+app.put("/", (req, res) => {
+    console.log(req.body);
+    res.send("Data Recieved Successfully!");
+})
 
 
 app.post('/', (req, res) => {
     const useremail = req.body.emailField;
     const password = req.body.passwordField;
-    const checkUser = `SELECT * FROM User WHERE user_email = "${useremail}" AND user_password = "${password}"`;
+
+    /// MAKING IT MORE CONSISTENT
+    // const checkUser = `SELECT * FROM User WHERE user_email = "${useremail}" AND user_password = "${password}"`;
     
-    db.query(checkUser, (err, rows) => {
+    // db.query(checkUser, (err, rows) => {
+
+    const checkUser = `SELECT * FROM User WHERE user_email = ? AND user_password = ?`;
+
+    connection.query(checkUser, [useremail, password], (err, rows) => {
         if (err) throw err;
         const numRows = rows.length;
         if (numRows > 0) {
@@ -291,10 +348,10 @@ app.get('/views/alluserscollections/:userId', (req, res) => {
 
     // get collections data for the member along with their display name
     const collectionsQuery = `
-        SELECT u.user_display_name, c.collection_name, c.collection_description, c.collection_id
-        FROM collection c
-        INNER JOIN User u ON c.user_id = u.user_id
-        WHERE c.user_id = ?
+        SELECT u.user_display_name, c.collection_name, c.collection_description, c.collection_id, u.user_image
+        FROM User u
+LEFT JOIN collection c ON u.user_id = c.user_id
+WHERE u.user_id = ?
     `;
 
     connection.query(collectionsQuery, [viewedMemberId], (err, rows) => {
@@ -377,12 +434,17 @@ app.get('/views/wishlist', (req, res) => {
         return;
     }
 
+     // Check if the user is logged in
     const userLoggedIn = req.session.authen ? true : false;
-    const userId = req.session.authen; // Get the logged-in user's ID from the session
+    console.log('userLoggedIn:', userLoggedIn);
+
+      // Get the ID of the logged-in user
+    const userId = req.session.authen; 
+    console.log('loggedInUserId:', userId);
 
     // Query to retrieve card details from the user's wishlist
     const wishlistQuery = `
-        SELECT card.card_id, card.card_name, card.image_url
+        SELECT card.card_id, card.card_name, card.image_url, wishlist_id
         FROM wishlist
         JOIN card ON wishlist.card_id = card.card_id
         WHERE wishlist.user_id = ?
@@ -396,7 +458,7 @@ app.get('/views/wishlist', (req, res) => {
         }
 
         // Pass user's wishlist data to the view for rendering
-        res.render('wishlist', { cards: rows });
+        res.render('wishlist', { cards: rows, userLoggedIn: userLoggedIn, loggedInUserId: userId });
     });
 });
 
@@ -461,8 +523,8 @@ app.get('/views/comments/:collectionId', (req, res) => {
 
 
 
-// COPYING THIS
-// Route to handle deleting a comment
+
+// deleting a comment
 app.delete('/views/deletecomment/:commentId', (req, res) => {
    
     // Check if the user is logged in
@@ -493,9 +555,10 @@ app.delete('/views/deletecomment/:commentId', (req, res) => {
 
         // Send a success response
         res.status(200).send('Comment deleted successfully');
+         // confirm on consle
+         console.log("Comment deleted successfully");
     });
 });
-
 
 
 
@@ -710,45 +773,98 @@ app.post('/views/addtocollection/:id', (req, res) => {
 
 
 // add a card to a wishlist
+// add a card to a wishlist
 app.post('/views/addtowishlist/:id', (req, res) => {
 
-     // Check if the user is logged in
-     if (!req.session.authen) {
+    // Check if the user is logged in
+    if (!req.session.authen) {
+       // If user is not logged in, redirect to the login page or show an error message
+       res.redirect('/views/login'); // Adjust the route as per your application's login page
+       return;
+   }
 
-        // If user is not logged in, redirect to the login page or show an error message
-        res.redirect('/views/login'); // Adjust the route as per your application's login page
-        return;
-    }
+   // Get the user ID from the session
+   const userId = req.session.authen;
 
-    // Get the user ID from the session
-    const userId = req.session.authen;
+   // gets the cardId from the request body
+   const cardId = req.body.cardId;
 
-    // gets the cardId from the request body
-    const cardId = req.body.cardId;
+   // checks if these have been got correctly
+   console.log('Received cardId:', cardId);
+   console.log('Received userId:', userId);
 
-    // checks if these have been got correctly
-    
-    console.log('Received cardId:', cardId);
-    console.log('Received userId:', userId);
+   if (!cardId) {
+       console.error('Card ID is undefined');
+       res.status(400).send('Card ID is missing');
+       return;
+   }
 
-    if (!cardId) {
-        console.error('Card ID is undefined');
-        res.status(400).send('Card ID is missing');
-        return;
-    }
-    const insertQuery = 'INSERT INTO wishlist (user_id, card_id) VALUES (?, ?)';
-    connection.query(insertQuery, [userId, cardId], (err, result) => {
-        if (err) {
-            console.error('Error adding card to wishlist:', err);
-            res.status(500).send('Error adding card to wishlist');
-            return;
-        }
-        
-        res.redirect(`/views/wishlist`);
-    });
-    
+   // Check if the card already exists in the user's wishlist
+   const checkQuery = 'SELECT * FROM wishlist WHERE user_id = ? AND card_id = ?';
+   connection.query(checkQuery, [userId, cardId], (checkErr, checkResult) => {
+       if (checkErr) {
+           console.error('Error checking wishlist:', checkErr);
+           res.status(500).send('Error checking wishlist');
+           return;
+       }
+
+       // If the card already exists in the wishlist, inform the user
+       if (checkResult.length > 0) {
+           console.log('Card already exists in wishlist');
+           res.status(400).send('This card is already in your wishlist');
+           return;
+       }
+
+       // If the card does not exist in the wishlist, add it
+       const insertQuery = 'INSERT INTO wishlist (user_id, card_id) VALUES (?, ?)';
+       connection.query(insertQuery, [userId, cardId], (insertErr, insertResult) => {
+           if (insertErr) {
+               console.error('Error adding card to wishlist:', insertErr);
+               res.status(500).send('Error adding card to wishlist');
+               return;
+           }
+           
+           res.redirect(`/views/wishlist`);
+       });
+   });
 });
 
+
+// DELETE a card from user's WISHLIST
+app.delete('/views/deletefromwishlist/:wishlistId', (req, res) => {
+   
+    // Check if the user is logged in
+    if (!req.session.authen) {
+        res.status(401).send('Unauthorised ??');
+        return;
+    }
+
+    // Extract the comment ID from the request parameters
+    const wishlistId = req.params.wishlistId;
+
+    // Query to delete the comment from the database
+    const deleteFromWishlistQuery = 'DELETE FROM wishlist WHERE `wishlist`.`wishlist_id` = ?';
+
+    // Execute the query
+    connection.query(deleteFromWishlistQuery, [wishlistId], (err, result) => {
+        if (err) {
+            console.error('Error deleting comment:', err);
+            res.status(500).send('Error deleting comment');
+            return;
+        }
+
+        // Check if any rows were affected
+        if (result.affectedRows === 0) {
+            res.status(404).send('Comment not found');
+            return;
+        }
+
+        // Send a success response
+        res.status(200).send('Card from Wishlist deleted successfully');
+         // confirm on consle
+         console.log("Card from Wishlist successfully");
+    });
+});
 
 
 
@@ -757,11 +873,7 @@ app.get('/views/index',  (req, res) => {
     res.render('index');
 });
 
-app.post('/fav',  (req, res) => {
-    //change global variable favband to the value of the text field
-    favband = req.body.favourite;
-    res.render('index', {data: favband});
-});
+
 
 app.get('/views/blog',  (req, res) => {
     // Check if the user is logged in
@@ -793,6 +905,13 @@ app.get('/views/login', (req, res) => {
     res.render('login', { loginError: false }); // Pass loginError as false initially
 });
 
+
+// 2. Render login page - don't think i need this
+// app.get('/views/login', (req, res) => {
+//     res.render('login');
+// });
+
+
 app.get('/views/register',  (req, res) => {
     res.render('register');
 });
@@ -814,12 +933,17 @@ app.get('/views/newmember',  (req, res) => {
     res.render('newmember');
 });
 
+
 // 1. a user signing up and becoming a new member 
 app.post('/newmember', (req, res) => {
     const email = req.body.registerEmail;
     const password = req.body.registerPassword;
-    const firstname = req.body.registerFirstName;
-    const lastname = req.body.registerLastName;
+    let firstname = req.body.registerFirstName;
+    let lastname = req.body.registerLastName;
+
+    // Capitalize the first letter of first and last names
+    firstname = capitalizeFirstLetter(firstname);
+    lastname = capitalizeFirstLetter(lastname);
 
     const checkQuery = 'SELECT * FROM User WHERE user_email = ?';
     connection.query(checkQuery, [email], (err, rows) => {
@@ -852,7 +976,7 @@ app.post('/newmember', (req, res) => {
                         return;
                     }
 
-                    res.render('login');
+                    res.render('login', { loginError: true });
                 });
             });
         }
@@ -860,10 +984,7 @@ app.post('/newmember', (req, res) => {
 });
 
  
-// 2. Render login page
-app.get('/views/login', (req, res) => {
-    res.render('login');
-});
+
 
 
 // 3. the user logs into their account
@@ -881,8 +1002,7 @@ app.post("/views/login", async (req, res) => {
             const user = result[0];
             const storedHashedPassword = String(user.user_password);
 
-            // Authenticate user
-            console.log("User authenticated, setting session:", user.user_id);
+           
 
             // verifying the password
             bcrypt.compare(loginPassword, storedHashedPassword, (err, passwordMatch) => {
@@ -894,6 +1014,8 @@ app.post("/views/login", async (req, res) => {
                 if (passwordMatch) {
                     req.session.authen = user.user_id; // Set user ID in session upon successful login
                     res.redirect('/views/dashboard');
+                     // Authenticate user
+            console.log("User authenticated, setting session:", user.user_id);
                 } else {
                     // Set loginError to true to indicate a failed login attempt
                     res.render('login', { loginError: true });
@@ -938,8 +1060,8 @@ app.get('/views/dashboard', (req, res) => {
                 return;
             }
             if (rows.length > 0) {
-                const firstRow = rows[0];
-                res.render('dashboard', { userLoggedIn: userLoggedIn, userData: firstRow });
+                const userInfo = rows[0];
+                res.render('dashboard', { userLoggedIn: userLoggedIn, userData: userInfo });
             } else {
                 res.send("User not found");
             }
@@ -968,8 +1090,8 @@ app.get('/views/account', (req, res) => {
                return;
            }
            if (rows.length > 0) {
-               const firstRow = rows[0];
-               res.render('account', { userLoggedIn: userLoggedIn, userData: firstRow });
+               const userInfo = rows[0];
+               res.render('account', { userLoggedIn: userLoggedIn, userData: userInfo });
            } else {
                res.send("User not found");
            }
@@ -1025,8 +1147,8 @@ app.get('/views/createcollection', (req, res) => {
                 return;
             }
             if (rows.length > 0) {
-                const firstRow = rows[0];
-                res.render('createcollection', { userLoggedIn: userLoggedIn, userData: firstRow });
+                const userInfo = rows[0];
+                res.render('createcollection', { userLoggedIn: userLoggedIn, userData: userInfo });
             } else {
                 res.send("User not found");
             }
@@ -1071,8 +1193,8 @@ app.post('/createcollection', (req, res) => {
 // Handle the PUT request to update user's display name
 //app.put('/updateUser', (req, res) => {
 app.post('/updateUser', (req, res) => {
-    console.log('PUT /updateUser route hit'); // Add this line to log when the route is hit
-    console.log('Request body:', req.body); // Add this line to log the request body
+    console.log('PUT /updateUser route hit'); 
+    console.log('Request body:', req.body); 
 
     const newDisplayName = req.body.newDisplayName;
     const userId = req.session.authen; // Assuming you store user ID in session
@@ -1091,12 +1213,17 @@ app.post('/updateUser', (req, res) => {
 
 
 
-// Handle the PUT request to update user's first name
+
+// Handle the PUT request to update user's FIRST name
 app.post('/updateFirstName', (req, res) => {
     console.log('POST /updateFirstName route hit');
     console.log('Request body:', req.body);
 
-    const newFirstName = req.body.newFirstName;
+    let newFirstName = req.body.newFirstName;
+
+      // Capitalize first letter of last name
+      newFirstName = capitalizeFirstLetter(newFirstName);
+
     const userId = req.session.authen;
 
     const updateQuery = 'UPDATE User SET user_first_name = ? WHERE user_id = ?';
@@ -1111,12 +1238,18 @@ app.post('/updateFirstName', (req, res) => {
     });
 });
 
-// Handle the PUT request to update user's last name
+
+// Handle the PUT request to update user's LAST name
 app.post('/updateLastName', (req, res) => {
     console.log('POST /updateLastName route hit');
     console.log('Request body:', req.body);
 
-    const newLastName = req.body.newLastName;
+   // OLD --> const newLastName = req.body.newLastName;
+   let newLastName = req.body.newLastName;
+   
+    // Capitalize first letter of last name
+    newLastName = capitalizeFirstLetter(newLastName);
+
     const userId = req.session.authen;
 
     const updateQuery = 'UPDATE User SET user_last_name = ? WHERE user_id = ?';
@@ -1130,6 +1263,10 @@ app.post('/updateLastName', (req, res) => {
         res.redirect('/views/dashboard');
     });
 });
+
+
+
+
 
 
 
@@ -1163,12 +1300,15 @@ app.delete('/views/deletefromcollection/:collectionCardId', (req, res) => {
 });
 
 
-
+// Route handler for 404 errors
 app.get('*', (req, res) => {
-    res.send('404! This is an invalid URL.');
-  });
+    res.status(404).render('errorpage', { 
+        errorCode: 404, 
+        errorTitle: 'Oh no!',
+        errorMessage: 'We can\'t find the page you\'re looking for.'  
+    });
+});
 
-  
 
 app.listen(process.env.PORT || 3003, ()=>{ 
     console.log("server started on: localhost:3003");
