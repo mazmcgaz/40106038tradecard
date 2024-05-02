@@ -27,7 +27,7 @@
       alt="display picture for the user"
     />
 
-    <!-- conditional -->
+    <!-- Conditional display based on collections -->
     <% if (collections && collections.length > 0 &&
     collections[0].collection_name !== null && collections[0].collection_id !==
     null) { %>
@@ -48,34 +48,37 @@
         </div>
       </div>
     </div>
-    <!-- Grey separation line -->
+
     <hr class="my-4" />
 
     <div class="container">
       <div class="row">
-        <%- console.log("Collections:", collections) %> <% if (collections &&
-        collections.length > 0 && collections[0].collection_name !== null &&
-        collections[0].collection_id !== null) { %> <%
-        collections.forEach((collection) => { %>
-
+        <% if (collections && collections.length > 0 &&
+        collections[0].collection_name !== null && collections[0].collection_id
+        !== null) { %> <% collections.forEach((collection) => { %>
         <div class="col-md-4">
-          <!-- Bootstrap column for each action item -->
           <div class="card mb-3">
             <div class="card-body">
-              <!-- Collection name -->
               <h4><%= collection.collection_name %></h4>
-
-              <!-- Collection description -->
               <p><%= collection.collection_description %></p>
-
-              <!-- Button group for view and delete buttons -->
+              <p>Likes: <%= collection.like_count %></p>
               <a
                 href="/views/collectiondetails/<%= collection.collection_id %>"
                 class="btn btn-primary"
                 >View Collection</a
               >
 
-              <!-- add the ratings here-->
+              <!-- Ratings section -->
+              <% if (userLoggedIn) { %>
+
+              <button
+                id="like-button<%= collection.collection_id %>"
+                onclick="toggleLike()"
+              >
+                Like
+              </button>
+              <span id="like-count<%= collection.collection_id %>"></span>
+
               <div class="container" id="ratingcontainer">
                 <div class="rating-wrap">
                   <h2>Rating:</h2>
@@ -96,11 +99,14 @@
                         class="full"
                       ></label>
                       <% } %>
+                      <p>Average Rating: <%= collection.average_rating %>/5</p>
+                      <!-- Display average rating -->
                     </fieldset>
                   </div>
                   <h4 id="rating-value<%= collection.collection_id %>"></h4>
                 </div>
               </div>
+              <% } %>
 
               <!-- DEBUGGING - display collection.user_id and collection.collection_id for debugging -->
               <%- console.log("User ID:", userId, "Collection ID:",
@@ -108,9 +114,9 @@
             </div>
           </div>
         </div>
-        <% }) %> <% } else { %> <% } %>
-
-        <!-- Loop through all of the collections -->
+        <% }) %> <% } else { %>
+        <h4>Please log in to interact with collections.</h4>
+        <% } %>
       </div>
     </div>
   </div>
@@ -119,42 +125,71 @@
 <%- include("partials/footer.ejs") %>
 
 <script>
-  document.addEventListener("DOMContentLoaded", function () {
-    let ratings = document.querySelectorAll(".rating");
-    ratings.forEach((rating) => {
-      let collectionId = rating.dataset.collectionId;
-      let storedRating = localStorage.getItem(`rating${collectionId}`);
-      if (storedRating) {
-        let selectedStar = rating.querySelector(
-          `#star${collectionId}${storedRating}`
-        );
-        if (selectedStar) {
-          selectedStar.checked = true;
-          updateRating(collectionId, storedRating);
+  function toggleLike(collectionId) {
+    const likeButton = document.getElementById(`like-button-${collectionId}`);
+    const likeCountElement = document.getElementById(
+      `like-count-${collectionId}`
+    );
+
+    // Ensure likeCountElement is not null before accessing its innerText
+    let likeCount = likeCountElement ? parseInt(likeCountElement.innerText) : 0;
+
+    // Toggle the like button state
+    if (likeButton.innerText === "Like") {
+      likeButton.innerText = "Unlike";
+      likeCount++;
+    } else {
+      likeButton.innerText = "Like";
+      likeCount--;
+    }
+
+    // Update the like count display
+    likeCountElement.innerText = likeCount;
+
+    // Send request to update the like count on the server
+    fetch(`/views/like-collection/${collectionId}`, {
+      method: "POST",
+    })
+      .then((response) => {
+        if (!response.ok) {
+          throw new Error("Network response was not ok");
         }
-      }
-
-      // Add event listeners to radio buttons
-      let radioButtons = rating.querySelectorAll('input[type="radio"]');
-      radioButtons.forEach((radioButton) => {
-        radioButton.addEventListener("change", function () {
-          saveRating(collectionId, this.value);
-        });
+      })
+      .catch((error) => {
+        console.error("Error updating like count:", error);
       });
-    });
-  });
-
-  function saveRating(collectionId, ratingValue) {
-    localStorage.setItem(`rating${collectionId}`, ratingValue);
-    updateRating(collectionId, ratingValue);
   }
 
-  function updateRating(collectionId, ratingValue) {
-    let ratingValueElement = document.querySelector(
-      `#rating-value${collectionId}`
-    );
-    if (ratingValueElement) {
-      ratingValueElement.innerHTML = ratingValue + " out of 5";
-    }
+  // Function to submit rating data to server
+  function submitRating(collectionId, ratingValue) {
+    const data = {
+      ratingValue: ratingValue,
+      collectionId: collectionId,
+    };
+
+    fetch("/submit-rating", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify(data),
+    })
+      .then((response) => {
+        if (!response.ok) {
+          throw new Error("Network response was not ok");
+        }
+        return response.json();
+      })
+      .then((data) => {
+        const ratingElement = document.getElementById(
+          "rating-value" + collectionId
+        );
+        if (ratingElement) {
+          ratingElement.textContent = `Your rating: ${ratingValue}/5`;
+        }
+      })
+      .catch((error) => {
+        console.error("Error submitting rating:", error);
+      });
   }
 </script>

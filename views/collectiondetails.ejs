@@ -1,5 +1,3 @@
-<%- include("partials/header.ejs") %>
-
 <style></style>
 
 <div class="px-4 pt-5 my-5 text-center border-bottom">
@@ -7,7 +5,7 @@
   <br />
 
   <main>
-    <% if (userLoggedIn) { %>
+    <%- include("partials/header.ejs") %> <% if (userLoggedIn) { %>
     <div class="container">
       <div class="row">
         <div class="col-md-12 text-center">
@@ -66,10 +64,13 @@
               class="card-image"
             />
 
-            <!-- Button container for two buttons -->
             <div class="button-container">
               <!-- View details button -->
-              <button type="button" class="btn btn-primary">
+              <button
+                type="button"
+                class="btn btn-primary"
+                onclick="window.location='/views/carddetailspage/<%= card.card_id %>'"
+              >
                 View Details
               </button>
 
@@ -82,6 +83,7 @@
               >
                 Delete from Collection
               </button>
+
               <% } %>
             </div>
           </div>
@@ -89,13 +91,17 @@
         <% }) %> <% } %>
       </div>
     </div>
+    <%- include("partials/footer.ejs") %>
   </main>
 </div>
 
 <script>
+  // deleting a card from a collection
   function deleteFromCollection(collectionCardId) {
     if (
-      confirm("Are you sure you want to delete this card from the collection?")
+      confirm(
+        "heyyy Are you sure you want to delete this card from the collection?"
+      )
     ) {
       fetch(`/views/deletefromcollection/${collectionCardId}`, {
         method: "DELETE",
@@ -117,5 +123,3 @@
     }
   }
 </script>
-
-<%- include("partials/footer.ejs") %>

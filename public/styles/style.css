@@ -12,6 +12,17 @@ header {
   font-size: 30px;
 }
 
+.navbar-pikachoosecards {
+  display: block;
+  text-decoration: none;
+  color: inherit;
+  cursor: pointer;
+}
+
+.navbar-pikachoosecards:hover {
+  text-decoration: underline; /* You can customize this as per your preference */
+}
+
 main {
   font-family: "Jersey 20", sans-serif;
 }
@@ -355,6 +366,7 @@ footer .menu li a:hover {
 }
 
 /* star rating on members' collections */
+/* adjusted from Youtube tutorial */
 .rating-wrap {
   max-width: 480px;
   margin: auto;
@@ -417,6 +429,12 @@ footer .menu li a:hover {
 }
 
 /* end of star rating on members' collections */
+
+/* like button on collectiondetails page */
+.like-button {
+  color: blue;
+}
+/* end of like button */
 
 /* media breakpoints / responsiveness */
 

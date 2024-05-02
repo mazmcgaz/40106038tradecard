@@ -1,13 +1,11 @@
 
 const mysql  = require('mysql2');
 
-
-
 const db = mysql.createConnection({
     host: 'localhost',
     user: 'root',
     password: 'root',
-    database: 'tradecard_project',  //change to your DB name
+    database: '40106038',  
     port: '8889'
 });
 

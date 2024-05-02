@@ -1,4 +1,4 @@
-<%- include("partials/header.ejs") %>
+
 
 <style>
   .action-item {
@@ -15,16 +15,18 @@
   }
 
   .action-item img {
-    max-width: 90%; /* Set maximum width for images */
-    height: auto; /* Maintain aspect ratio */
+    max-width: 90%;
+    height: auto;
   }
 
   /* Modal styles */
   .modal-dialog {
-    max-width: 800px; /* Adjust maximum width as needed */
+    max-width: 800px;
   }
 </style>
 
+<main>
+  <%- include("partials/header.ejs") %>
 <div class="px-4 pt-5 my-5 text-center border-bottom">
   <h1 class="display-4 fw-bold text-body-emphasis"><%= title %></h1>
   <br />
@@ -95,6 +97,18 @@
     <a href="/views/allcards/filter?expansion_id=9" class="btn btn-secondary"
       >Sword & Shield</a
     >
+    <a href="/views/allcards/filter?expansion_id=10" class="btn btn-secondary"
+    >Neo Destiny</a
+  >
+  <a href="/views/allcards/filter?expansion_id=11" class="btn btn-secondary"
+    >Plasma Destiny</a
+  >
+  <a href="/views/allcards/filter?expansion_id=12" class="btn btn-secondary"
+    >Legendary Collection</a
+  >
+  <a href="/views/allcards/filter?expansion_id=13" class="btn btn-secondary"
+    >Wizards Black Star Promos</a
+  >
 
     <!-- Filter by RARITY -->
     <p>Filter by Rarity:</p>
@@ -125,6 +139,14 @@
     <a href="/views/allcards/filter?stage_id=9" class="btn btn-secondary"
       >Stage 2</a
     >
+    <p>Filter by Format:</p>
+    <a href="/views/allcards/filter?format_id=1" class="btn btn-secondary"
+      >Unlimited</a
+    >
+    <a href="/views/allcards/filter?format_id=2" class="btn btn-secondary"
+      >Expanded</a
+    >
+    
   </div>
 
   <!-- Grey separation line -->
@@ -135,10 +157,11 @@
       <!-- Loop through all of the cards -->
       <% rowdata.forEach((card)=> { %>
       <div class="col-md-4">
-        <!-- Bootstrap column for each action item -->
+        <!-- column for each action item -->
         <div
           class="action-item"
           onclick="window.location='/views/carddetailspage/<%= card.card_id %>'"
+          style="cursor: pointer"
         >
           <!-- card name -->
           <h4><%= card.card_name %></h4>
@@ -155,7 +178,7 @@
             method="POST"
           >
             <button id="addToWishlistButton" type="submit" class="btn btn-info">
-              Add to Wishlist
+              Add to Wishlist <i class="fa fa-heart-o" aria-hidden="true"></i>
             </button>
 
             <!-- Hidden input field to store cardId -->
@@ -171,9 +194,9 @@
     </div>
   </div>
 
-  <main>
-    <!-- Mainh content goes here -->
-  </main>
 
   <%- include("partials/footer.ejs") %>
+  </main>
+
+ 
 </div>

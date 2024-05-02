@@ -23,6 +23,8 @@
               class="form-control"
               placeholder="e.g. Ash"
               required
+              minlength="1"
+              maxlength="20"
             />
           </div>
           <div class="mb-3">
@@ -34,6 +36,8 @@
               class="form-control"
               placeholder="e.g. Ketchum"
               required
+              minlength="1"
+              maxlength="20"
             />
           </div>
           <div class="mb-3">
@@ -82,6 +86,21 @@
               required
             />
           </div>
+
+          <div class="mb-3">
+            <label for="registerDateOfBirth" class="form-label"
+              >Date of Birth:</label
+            >
+            <p>Note: You must be at least 13 years old to join this site.</p>
+            <input
+              id="registerDateOfBirth"
+              name="registerDateOfBirth"
+              type="date"
+              class="form-control"
+              required
+            />
+          </div>
+
           <div class="form-group">
             <div class="form-check">
               <br />
@@ -223,6 +242,39 @@
   </div>
 </main>
 
+<!-- error message modal on date of birth-->
+<div id="errorModal" class="modal fade" tabindex="-1" role="dialog">
+  <div class="modal-dialog" role="document">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title">Error</h5>
+        <button
+          type="button"
+          class="close"
+          data-dismiss="modal"
+          aria-label="Close"
+          onclick="closeModal()"
+        >
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body">
+        <p id="modalMessage"></p>
+      </div>
+      <div class="modal-footer">
+        <button
+          type="button"
+          class="btn btn-secondary"
+          data-dismiss="modal"
+          onclick="closeModal()"
+        >
+          Close
+        </button>
+      </div>
+    </div>
+  </div>
+</div>
+
 <%- include("partials/footer.ejs") %>
 
 <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
@@ -230,15 +282,115 @@
 <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
 
 <script>
-  // open modal when the button is clicked
+  // Function to close the modal
+  function closeModal() {
+    var modal = document.getElementById("exampleModalLong");
+    modal.classList.remove("show");
+    modal.style.display = "none";
+    document.body.classList.remove("modal-open");
+  }
+
+  // Function to close the modal when clicked outside
+  function closeModalOnClickOutside(event) {
+    var modal = document.getElementById("exampleModalLong");
+    if (event.target !== modal && !modal.contains(event.target)) {
+      closeModal();
+    }
+  }
+
+  // Function to validate email match
+  function validateEmailMatch() {
+    var email1 = document.getElementById("registerEmail").value;
+    var email2 = document.getElementById("registerEmail2").value;
+
+    if (email1 !== email2) {
+      displayModal("Email addresses do not match.");
+
+      // clear the email fields for the user to try again
+      document.getElementById("registerEmail").value = "";
+      document.getElementById("registerEmail2").value = "";
+
+      // put the cursor here
+      document.getElementById("registerEmail").focus();
+      return false;
+    }
+    return true;
+  }
+
+  // Function to check that the emails match
+  function validatePasswordMatch() {
+    var password1 = document.getElementById("registerPassword").value;
+    var password2 = document.getElementById("registerPassword2").value;
+
+    if (password1 !== password2) {
+      displayModal("Passwords do not match.");
+
+      // clear the password fields for the user to try again
+      document.getElementById("registerPassword").value = "";
+      document.getElementById("registerPassword2").value = "";
+
+      // put the cursor here
+      document.getElementById("registerPassword").focus();
+
+      return false;
+    }
+    return true;
+  }
+
+  // Function to validate date of birth
+  function validateDateOfBirth() {
+    var dobInput = document.getElementById("registerDateOfBirth");
+    var selectedDate = new Date(dobInput.value);
+    var thirteenYearsAgo = new Date();
+    thirteenYearsAgo.setFullYear(thirteenYearsAgo.getFullYear() - 13);
+
+    if (selectedDate > thirteenYearsAgo) {
+      displayModal("You must be at least 13 years old to sign up.");
+      dobInput.value = ""; // Clear the input field
+      dobInput.focus(); // Set focus back to the date of birth field
+      return false;
+    }
+    return true;
+  }
+
+  // Function to display modal
+  function displayModal(message) {
+    var modal = document.getElementById("errorModal");
+    var modalMessage = document.getElementById("modalMessage");
+    modalMessage.textContent = message;
+    modal.classList.add("show");
+    modal.style.display = "block";
+    document.body.classList.add("modal-open");
+  }
+
+  // EVENT LISTENERS
+  // Close modal when the close button is clicked
   document
-    .getElementById("termsModalButton")
+    .getElementById("closeModalButton")
     .addEventListener("click", function () {
-      var modal = document.getElementById("exampleModalLong");
-      modal.classList.add("show");
-      modal.style.display = "block";
-      document.body.classList.add("modal-open");
+      closeModal();
     });
+
+  // Close modal when the close button in the footer is clicked
+  document
+    .getElementById("closeModalFooterButton")
+    .addEventListener("click", function () {
+      closeModal();
+    });
+
+  // Close modal when clicked outside
+  document.addEventListener("click", function (event) {
+    if (event.target === document.getElementById("exampleModalLong")) {
+      closeModal();
+    }
+  });
+
+  // Close modal when Escape key is pressed
+  document.addEventListener("keydown", function (event) {
+    if (event.key === "Escape") {
+      closeModal();
+    }
+  });
 
   // Function to close the modal
   function closeModal() {
@@ -248,20 +400,46 @@
     document.body.classList.remove("modal-open");
   }
 
-  // close modal when the close button in the header is clicked
-  document
-    .getElementById("closeModalButton")
-    .addEventListener("click", closeModal);
+  // validate the email, password, and age of user signing up
+  function validateForm() {
+    var valid = true;
 
-  // close modal when the close button in the footer is clicked
-  document
-    .getElementById("closeModalFooterButton")
-    .addEventListener("click", closeModal);
-
-  // When the user clicks anywhere outside of the modal, close it
-  window.onclick = function (event) {
-    if (event.target == modal) {
-      modal.style.display = "none";
+    // Validate date of birth
+    var dobValid = validateDateOfBirth();
+    if (!dobValid) {
+      valid = false;
     }
-  };
+
+    // Validate email match
+    var emailValid = validateEmailMatch();
+    if (!emailValid) {
+      valid = false;
+    }
+
+    // Validate password match
+    var passwordValid = validatePasswordMatch();
+    if (!passwordValid) {
+      valid = false;
+    }
+
+    return valid;
+  }
+
+  document
+    .getElementById("registerForm")
+    .addEventListener("submit", function (event) {
+      if (!validateForm()) {
+        event.preventDefault(); // Prevent form submission if validation fails
+      }
+    });
+
+  // Open modal when the button is clicked
+  document
+    .getElementById("termsModalButton")
+    .addEventListener("click", function () {
+      var modal = document.getElementById("exampleModalLong");
+      modal.classList.add("show");
+      modal.style.display = "block";
+      document.body.classList.add("modal-open");
+    });
 </script>

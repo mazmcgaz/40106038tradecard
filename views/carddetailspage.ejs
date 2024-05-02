@@ -34,7 +34,6 @@
   <h1 class="display-4 fw-bold text-body-emphasis">Card Details</h1>
   <br />
 
-  <% if (userLoggedIn) { %>
   <div class="container">
     <div class="row">
       <div class="col-md-12 text-center">
@@ -43,6 +42,7 @@
           class="btn btn-primary back-to-cards-button"
           >Back to Cards</a
         >
+        <% if (userLoggedIn) { %>
         <a href="/views/dashboard" class="btn btn-primary back-to-cards-button"
           >Go to Dashboard</a
         >
@@ -59,33 +59,66 @@
           <!-- Card Details -->
           <div class="card-details">
             <h2><%= card.card_name %></h2>
-            <p>HP <%= card.hit_points_id %></p>
-
+            <p>HP <%= card.hit_points_number%></p>
+            <hr />
+            <!-- Horizontal line for separation -->
             <p>
-              <img src="<%= card.attack_1_img_1 %>" alt="" class="card-image" />
+              <h4><img src="<%= card.attack_1_img_1 %>" alt="" class="card-image" />
               <img src="<%= card.attack_1_img_2 %>" alt="" class="card-image" />
               <img src="<%= card.attack_1_img_3 %>" alt="" class="card-image" />
-              <%= card.attack_1 %>
+              <img src="<%= card.attack_1_img_4 %>" alt="" class="card-image" />
+             <%= card.attack_1 %> <%= card.attack_1_number %></h4> 
+              <p><%= card.attack_1_desc %></p>
             </p>
+            <hr />
+            <!-- Horizontal line for separation -->
 
             <% if (card.attack_2) { %>
-            <p>
+            <p><h4>
               <img src="<%= card.attack_2_img_1 %>" alt="" class="card-image" />
               <img src="<%= card.attack_2_img_2 %>" alt="" class="card-image" />
               <img src="<%= card.attack_2_img_3 %>" alt="" class="card-image" />
-              <%= card.attack_2 %>
+              <img src="<%= card.attack_2_img_4 %>" alt="" class="card-image" />
+              <%= card.attack_2 %> <%= card.attack_2_number %></h4>
+              <p><%= card.attack_2_desc %></p>
             </p>
             <% } %>
+            <hr />
+            <!-- Horizontal line for separation -->
+            <p>
+              Weakness:
+              <img
+                src="<%= card.weakness_img %>"
+                alt=""
+                class="weakness-image"
+              />
 
-            <p>Weakness: <%= card.weakness_type %></p>
+              x<%= card.weakness_number %>
+            </p>
+            <p>
+              Resistance:
+              <img
+                src="<%= card.resistance_img %>"
+                alt=""
+                class="resistance-image"
+              />
+
+              <%= card.resistance_number%>
+            </p>
+
             <p>Condition: <%= card.card_condition_type %></p>
             <p>Rarity: <%= card.rarity_type %></p>
             <p>Expansion: <%= card.expansion_name %></p>
+            <p>Card Number: <%= card.card_number_number %></p>
+            <p>Card Format: <%= card.card_format_type %></p>
+            <hr />
+            <!-- Horizontal line for separation -->
+
             <p>
               Illustrator: <%= card.illustrator_first_name %> <%=
               card.illustrator_last_name %>
             </p>
-
+            <p>$<%= card.price_market %></p>
             <% if (userLoggedIn) { %>
 
             <form
@@ -108,7 +141,7 @@
             <div class="input-group mb-3">
               <div class="input-group-prepend">
                 <form
-                  id="addToCollectionForm"
+                  id="addToCollectionButton"
                   action="/views/addtocollection/<%= card.card_id %>"
                   method="POST"
                 >
@@ -161,25 +194,33 @@
 </div>
 
 <script>
-  // for adding a card to a collection
+  // 1) log the selected collectionId when the dropdown selection changes
   document
     .getElementById("collectionSelect")
     .addEventListener("change", function () {
-      const collectionId = this.value; // Get the selected collection_id from the dropdown menu
-
-      document.getElementById("collectionIdInput").value = collectionId; // Set the value of the hidden input field
-      document.getElementById("addToCollectionForm").submit(); // Submit the form
+      const selectedCollectionId = this.value;
+      console.log("Selected collectionId:", selectedCollectionId);
     });
 
-  // for adding a card to a user's wishlist
-  document.addEventListener("DOMContentLoaded", function () {
-    const addToWishlistButton = document.getElementById("addToWishlistButton");
-    addToWishlistButton.addEventListener("click", function (event) {
+  // Attach click event listener to "Add to Collection" button
+  document
+    .getElementById("addToCollectionButton")
+    .addEventListener("click", function (event) {
       event.preventDefault(); // Prevent the default form submission
-      const form = document.getElementById("addToWishlistForm");
-      form.submit(); // Submit the form
+      addToCollection(); // Call function to handle form submission
     });
-  });
+
+  // 1) function to handle the form submission when "add to Collection" button is clicked
+  function addToCollection() {
+    // when the user selects their collection from the dropdown menu, store the collection_id in here
+    const collectionId = document.getElementById("collectionSelect").value;
+
+    // set the value of the hidden input field to collectionId
+    document.getElementById("collectionIdInput").value = collectionId;
+
+    // Submit the form
+    document.getElementById("addToCollectionButton").submit();
+  }
 </script>
 
 <%- include("partials/footer.ejs") %>

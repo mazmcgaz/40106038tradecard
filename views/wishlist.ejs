@@ -32,6 +32,10 @@
 
 <div class="px-4 pt-5 my-5 text-center border-bottom">
   <h1 class="display-4 fw-bold text-body-emphasis">Your wishlist:</h1>
+  <h2>
+    Your wishlist is personal to you. <br />
+    Only you can view it.
+  </h2>
   <br />
 
   <% if (userLoggedIn) { %>
@@ -59,7 +63,7 @@
         <% } else { %> <% cards.forEach((card) => { %>
         <div class="col-md-6 card-details-container">
           <div class="card-details">
-            <h2><%= card.card_name %></h2>
+            <h3><%= card.card_name %></h3>
             <img
               src="<%= card.image_url %>"
               alt="<%= card.card_name %>"

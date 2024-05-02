@@ -1,5 +1,3 @@
-<%- include("partials/header.ejs") %>
-
 <style>
   .action-item {
     background-color: #96cc6a; /* Grey background */
@@ -15,6 +13,7 @@
 </style>
 
 <main>
+  <%- include("partials/header.ejs") %>
   <div class="px-4 pt-5 my-5 text-center border-bottom">
     <h1 class="display-4 fw-bold text-body-emphasis">Your Collections</h1>
     <h2>View your collections below:</h2>
@@ -43,7 +42,6 @@
         <!-- Loop through all of the collections -->
         <% collections.forEach((collection) => { %>
         <div class="col-md-4">
-          <!-- Bootstrap column for each action item -->
           <div class="action-item">
             <!-- Collection name -->
             <h4><%= collection.collection_name %></h4>
@@ -51,7 +49,6 @@
             <!-- Collection description -->
             <p><%= collection.collection_description %></p>
 
-            <!-- Button group for view and delete buttons -->
             <div class="d-flex justify-content-between">
               <!-- Button to view collection details -->
               <a
@@ -76,6 +73,5 @@
       </div>
     </div>
   </div>
+  <%- include("partials/footer.ejs") %>
 </main>
-
-<%- include("partials/footer.ejs") %>

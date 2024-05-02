@@ -27,6 +27,7 @@
             <strong class="user-name"><%= comment.user_display_name %>:</strong>
             <div class="comment-text"><%= comment.comment_text %></div>
           </div>
+          <!-- display the timestamp of when the comment was left, uses natural language to the UK / Ireland -->
           <div>
             <h6 class="text-end">
               <%= comment.created_at.toLocaleDateString('en-GB', { day:
@@ -56,7 +57,7 @@
 <%- include("partials/footer.ejs") %>
 
 <script>
-  // carry out the comment delete
+  // Carry out the comment delete
   function deleteComment(commentId) {
     // Make a DELETE request to delete the comment
     fetch(`/views/deletecomment/${commentId}`, {
