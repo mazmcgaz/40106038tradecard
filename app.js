@@ -85,7 +85,7 @@ function capitaliseFirstLetter(string) {
 
 
 
-// 1. DISPLAY HOME PAGE
+// DISPLAY HOME PAGE
 // not using the middleware here because I want the page to render for both logged in
 // and logged out users. Ie I don't want them to get sent to the log in page automatically
 app.get('/', async (req, res) => {
@@ -125,12 +125,7 @@ app.get('/', async (req, res) => {
 
 
 
-
-
-
-// *******
-// im not sure if i need this anymore
-// Updated this 
+ // not using anymore
 app.post('/', async (req, res) => {
     try {
         const useremail = req.body.emailField;
